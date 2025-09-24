@@ -1,7 +1,3 @@
-# gym-system
-trabalho da disciplina de engenharia de software - GCC188 
-
-
 # Gym System 
 
 Um sistema completo de **CRUD de sistema de academias**, desenvolvido com foco em boas práticas, testes automatizados e uma interface amigável. 
