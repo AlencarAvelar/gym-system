@@ -4,32 +4,15 @@ Um sistema completo de **CRUD de sistema de academias**, desenvolvido com foco e
 
 ## 🚀 Tecnologias Utilizadas
 
-### Backend
+### Front-End 
+- **React** -  v19.1.1.
 
+### Back-End
+- **Node.js** - 22.21.0.
+- **PostgreSQL** - v18.0
 
-### Frontend 
-
-### Testes
-
----
-
-## 🖥️ Como Rodar a Aplicação
-
-
-### Pré-requisitos
-
-### 1. Banco de Dados
-
-
-```sql
-
-```
----
-
-### 2. Backend
-
-
-### 3. Frontend
+### IDE
+- VSCode
 
 
 ## 👨‍💻 Desenvolvido por
