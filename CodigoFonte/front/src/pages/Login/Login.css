@@ -1,0 +1,65 @@
+/* Centraliza o container na tela inteira */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 100% da altura da tela */
+  background-color: #f0f2f5; /* Um fundo cinza claro */
+}
+
+/* O card/caixa do formulário */
+.login-form {
+  padding: 2rem; /* Espaçamento interno */
+  background: #ffffff; /* Fundo branco */
+  border-radius: 8px; /* Bordas arredondadas */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  display: flex;
+  flex-direction: column; /* Organiza os itens em coluna */
+  width: 350px; /* Largura fixa */
+}
+
+/* Estilo do título "Página de Login" */
+.login-form h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem; /* Espaço abaixo do título */
+  text-align: center; /* Centraliza o texto */
+  color: #333;
+}
+
+/* Grupo de Label + Input */
+.input-group {
+  display: flex;
+  flex-direction: column; /* Label em cima do input */
+  margin-bottom: 1rem; /* Espaço entre os grupos */
+}
+
+.input-group label {
+  margin-bottom: 0.5rem; /* Espaço entre a label e o input */
+  font-weight: 600; /* Texto em negrito leve */
+  color: #555;
+}
+
+.input-group input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem; /* Tamanho da fonte */
+}
+
+/* Botão de Entrar */
+.login-button {
+  padding: 0.75rem;
+  border: none; /* Sem borda */
+  border-radius: 4px;
+  background-color: #007bff; /* Cor primária (azul) */
+  color: white; /* Texto branco */
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer; /* Mãozinha ao passar o mouse */
+  transition: background-color 0.2s; /* Efeito suave */
+}
+
+/* Efeito "hover" (ao passar o mouse) no botão */
+.login-button:hover {
+  background-color: #0056b3; /* Azul mais escuro */
+}
