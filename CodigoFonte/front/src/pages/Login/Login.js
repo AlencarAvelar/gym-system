@@ -1,27 +1,41 @@
 import React from 'react';
-import './Login.css'; // Importa o nosso CSS
+import './Login.css';
 
 function Login() {
   return (
-    // Adicionamos um "container" para centralizar
-    <div className="login-container"> 
+    // 'login-page' agora é nossa "Seção Hero"
+    <div className="login-page"> 
       
-      {/* Nosso formulário */}
-      <form className="login-form">
-        <h2>Página de Login</h2>
+      {/* Novo container para o layout de 2 colunas */}
+      <div className="login-content">
         
-        <div className="input-group">
-          <label htmlFor="email">Email:</label>
-          <input type="email" id="email" />
+        {/* Coluna 1: O "Chamariz" */}
+        <div className="attention-text">
+          <h1>Transforme seu corpo.</h1>
+          <h1>Transforme sua vida.</h1>
+          <p>Acesse seu painel e agende seu próximo treino.</p>
         </div>
-        
-        <div className="input-group">
-          <label htmlFor="password">Senha:</label>
-          <input type="password" id="password" />
-        </div>
-        
-        <button type="submit" className="login-button">Entrar</button>
-      </form>
+
+        <form id="login-form" className="login-form">
+          <h2>Área do Cliente</h2>
+          
+          <div className="input-group">
+            <label htmlFor="email">Email:</label>
+            <input type="email" id="email" placeholder="seuemail@exemplo.com" required />
+          </div>
+          
+          <div className="input-group">
+            <label htmlFor="password">Senha:</label>
+            <input type="password" id="password" placeholder="Sua senha" required />
+          </div>
+          
+          <button type="submit" className="login-button">Entrar</button>
+
+          <div className="login-links">
+            <a href="#">Esqueci minha senha</a>
+          </div>
+        </form>
+      </div>
       
     </div>
   );

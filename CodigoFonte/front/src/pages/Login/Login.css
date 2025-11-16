@@ -1,65 +1,150 @@
-/* Centraliza o container na tela inteira */
-.login-container {
+/* O container "Hero" (100% da altura da tela) */
+.login-page {
+  width: 100%;
+  height: 100vh; /* Ocupa a primeira "dobra" inteira */
+  
+  /* Mantém o fundo que gostamos */
+  background-image: url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+
+  /* Centraliza o conteúdo (o layout de 2 colunas) */
   display: flex;
-  justify-content: center;
+  align-items: center; /* Centraliza verticalmente */
+  padding: 0 5%; /* 5% de margem nas laterais */
+  box-sizing: border-box;
+
+  /* Mantém o filtro escuro */
+  position: relative;
+  isolation: isolate;
+}
+
+.login-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.6;
+  z-index: -1;
+}
+
+/* O container do layout (Grid de 2 colunas) */
+.login-content {
+  width: 100%;
+  max-width: 1100px; /* Limita a largura do conteúdo */
+  margin: 0 auto; /* Centraliza o grid */
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Coluna 1 (texto) é 2x maior que a Coluna 2 (form) */
   align-items: center;
-  height: 100vh; /* 100% da altura da tela */
-  background-color: #f0f2f5; /* Um fundo cinza claro */
+  gap: 3rem; /* Espaço entre as colunas */
 }
 
-/* O card/caixa do formulário */
+/* Coluna 1: O "Chamariz" */
+.attention-text {
+  color: #fff;
+}
+
+.attention-text h1 {
+  font-size: 3.5rem; /* Texto grande */
+  font-weight: 800;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.attention-text h1:nth-child(2) {
+  color: #007bff; /* Destaque no segundo H1 */
+}
+
+.attention-text p {
+  font-size: 1.25rem;
+  color: #f0f0f0;
+  max-width: 500px; /* Limita a largura do parágrafo */
+}
+
+/* Coluna 2: O Formulário (igual ao que fizemos, mas agora no canto) */
 .login-form {
-  padding: 2rem; /* Espaçamento interno */
-  background: #ffffff; /* Fundo branco */
-  border-radius: 8px; /* Bordas arredondadas */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  padding: 2.5rem 2rem;
+  width: 100%;
+  
+  /* O mesmo efeito de vidro */
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
   display: flex;
-  flex-direction: column; /* Organiza os itens em coluna */
-  width: 350px; /* Largura fixa */
+  flex-direction: column;
+  gap: 1.25rem;
+  
+  /* Faz ele ficar na segunda coluna do grid */
+  grid-column: 2 / 3;
 }
 
-/* Estilo do título "Página de Login" */
+
+/* --- O RESTANTE DO CSS (Estilização do formulário) --- */
+/* (Isso é o mesmo que já tínhamos, apenas garantindo) */
+
 .login-form h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem; /* Espaço abaixo do título */
-  text-align: center; /* Centraliza o texto */
-  color: #333;
+  margin: 0;
+  color: #ffffff;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 700;
 }
 
-/* Grupo de Label + Input */
 .input-group {
   display: flex;
-  flex-direction: column; /* Label em cima do input */
-  margin-bottom: 1rem; /* Espaço entre os grupos */
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .input-group label {
-  margin-bottom: 0.5rem; /* Espaço entre a label e o input */
-  font-weight: 600; /* Texto em negrito leve */
-  color: #555;
+  color: #f0f0f0;
+  font-weight: 500;
 }
 
 .input-group input {
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem; /* Tamanho da fonte */
-}
-
-/* Botão de Entrar */
-.login-button {
-  padding: 0.75rem;
-  border: none; /* Sem borda */
-  border-radius: 4px;
-  background-color: #007bff; /* Cor primária (azul) */
-  color: white; /* Texto branco */
+  padding: 0.8rem;
+  border: 1px solid #555;
+  border-radius: 5px;
+  background: #333;
+  color: #ffffff;
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer; /* Mãozinha ao passar o mouse */
-  transition: background-color 0.2s; /* Efeito suave */
 }
 
-/* Efeito "hover" (ao passar o mouse) no botão */
+.login-button {
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff; /* Cor de destaque */
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
 .login-button:hover {
-  background-color: #0056b3; /* Azul mais escuro */
+  background-color: #0056b3;
+}
+
+.login-links {
+  text-align: center;
+}
+
+.login-links a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+#login-form {
+  scroll-margin-top: 6rem; /* 6rem = 96px (ajuste se precisar) */
 }
