@@ -148,3 +148,17 @@
 #login-form {
   scroll-margin-top: 6rem; /* 6rem = 96px (ajuste se precisar) */
 }
+
+/* Mensagem de erro dentro do formulário */
+.login-error-message {
+  background-color: #ffcccc; /* Fundo vermelho claro */
+  color: #a00; /* Texto vermelho escuro */
+  border: 1px solid #a00;
+  padding: 0.75rem;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%; /* Ocupa a largura toda do form */
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}

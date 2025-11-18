@@ -1,45 +1,59 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importamos o roteador
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+// Layouts
 import Header from './components/Header/Header'; 
 import Footer from './components/Footer/Footer'; 
-import Login from './pages/Login/Login'; // Garanta que o caminho está certo (Login ou login)
+import DashboardLayout from './layouts/DashboardLayout'; // <-- Importe o novo layout
+
+// Pages Públicas
+import Login from './pages/Login/Login'; 
 import PasswordRecovery from './pages/PasswordRecovery/PasswordRecovery';
+
 import './App.css'; 
 
 function App() {
   return (
-    <Router> {/* O 'Router' envolve o site inteiro */}
+    <Router>
       <div className="App">
-        <Header />
-        
-        <Routes> {/* Aqui definimos as "trocas" de página */}
+        <Routes>
           
-          {/* Rota da Home/Login (O caminho raiz "/") */}
+          {/* --- ROTAS PÚBLICAS (Com Header/Footer da Home) --- */}
           <Route path="/" element={
             <>
+              <Header />
               <Login />
-              {/* A seção dummy só aparece na Home */}
+              {/* Seção Dummy */}
               <div id="sobre-section" className="dummy-section">
-                <h2>O que oferecemos</h2>
-                <p>
-                  Descubra um novo jeito de treinar. No Gym System, oferecemos equipamentos de última geração, 
-                  uma equipe de instrutores certificados e um ambiente motivador para você alcançar seus objetivos.
-                </p>
-                <p>
-                  Nossas modalidades incluem Musculação, Treinamento Funcional, Aulas de Spinning e Yoga.
-                  Use nosso sistema para agendar sua próxima aula!
-                </p>
+                  {/* ... seu texto ... */}
+                  <p>Descubra um novo jeito de treinar...</p>
               </div>
+              <Footer />
             </>
           } />
 
-          {/* Rota de Recuperação de Senha */}
-          <Route path="/recuperar-senha" element={<PasswordRecovery />} />
+          <Route path="/recuperar-senha" element={
+            <>
+              <Header />
+              <PasswordRecovery />
+              <Footer />
+            </>
+          } />
+
+
+          {/* --- ROTAS PRIVADAS (Painel do Cliente) --- */}
+          {/* Aqui usamos o DashboardLayout como "Pai" */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            
+            {/* Esta será a página inicial do painel (/dashboard) */}
+            <Route index element={<div style={{color: '#333'}}><h1>Meus Agendamentos</h1><p>Aqui entrará a lista...</p></div>} />
+            
+            {/* Outras páginas internas virão aqui depois, ex: */}
+            {/* <Route path="atividades" element={<Atividades />} /> */}
+          
+          </Route>
 
         </Routes>
-
-        <Footer />
       </div>
     </Router>
   );
