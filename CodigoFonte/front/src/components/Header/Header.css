@@ -1,0 +1,64 @@
+/* O cabeçalho fixo */
+.main-header {
+  /* Efeito de vidro, igual ao login */
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+  width: 100%;
+  padding: 1rem 5%; /* 5% de margem nas laterais */
+  
+  /* Para ficar fixo no topo */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  /* Para alinhar o logo e a navegação */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+}
+
+/* O logo */
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.logo span {
+  color: #007bff; /* Nossa cor de destaque */
+}
+
+/* A navegação */
+.main-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.main-nav a {
+  color: #f0f0f0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.main-nav a:hover {
+  color: #007bff; /* Destaque no hover */
+}
+
+/* Botão de destaque (para o login, no futuro) */
+.main-nav a.nav-highlight {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.main-nav a.nav-highlight:hover {
+  background-color: #0056b3;
+  color: #fff;
+}

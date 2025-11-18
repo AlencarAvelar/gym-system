@@ -36,3 +36,29 @@
     transform: rotate(360deg);
   }
 }
+
+/* Remove margens padrão */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  
+  /* Fundo principal do site (para a parte rolável) */
+  background-color: #1c1c1c;
+}
+
+.dummy-section {
+  height: 500px; /* Apenas para criar espaço */
+  padding: 2rem 5%;
+  color: #fff;
+  background-color: #222;
+}
+
+.dummy-section h2 {
+  color: #007bff; /* Nossa cor de destaque */
+}
+
+#sobre-section {
+  scroll-margin-top: 6rem; /* Use o mesmo valor do passo 1 */
+}
