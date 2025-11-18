@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // <-- ADICIONE ISTO
 import './Login.css';
 
 function Login() {
@@ -32,7 +33,7 @@ function Login() {
           <button type="submit" className="login-button">Entrar</button>
 
           <div className="login-links">
-            <a href="#">Esqueci minha senha</a>
+            <Link to="/recuperar-senha">Esqueci minha senha</Link>
           </div>
         </form>
       </div>
