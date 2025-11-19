@@ -2,6 +2,25 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "nodemon": "^3.1.11",
     "pg": "^8.16.3"
-  }
+  },
+  "name": "gym-system",
+  "version": "1.0.0",
+  "description": "backend do projeto gym-system",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlencarAvelar/gym-system.git"
+  },
+  "author": "AlencarAvelar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlencarAvelar/gym-system/issues"
+  },
+  "homepage": "https://github.com/AlencarAvelar/gym-system#readme"
 }
