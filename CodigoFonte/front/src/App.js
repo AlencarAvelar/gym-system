@@ -9,7 +9,10 @@ import DashboardLayout from './layouts/DashboardLayout'; // <-- Importe o novo l
 // Pages Públicas
 import Login from './pages/Login/Login'; 
 import PasswordRecovery from './pages/PasswordRecovery/PasswordRecovery';
+
+// Page Cliente
 import MyAppointments from './pages/ClientDashboard/MyAppointments/MyAppointments';
+import AvailableActivities from './pages/ClientDashboard/AvailableActivities/AvailableActivities';
 
 import './App.css'; 
 
@@ -48,6 +51,8 @@ function App() {
             
             {/* Esta será a página inicial do painel (/dashboard) */}
             <Route index element={<MyAppointments />} />
+            {/* NOVA ROTA ADICIONADA: */}
+            <Route path="atividades" element={<AvailableActivities />} />
             
             {/* Outras páginas internas virão aqui depois, ex: */}
             {/* <Route path="atividades" element={<Atividades />} /> */}
