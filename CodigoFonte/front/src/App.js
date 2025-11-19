@@ -17,6 +17,7 @@ import AvailableActivities from './pages/ClientDashboard/AvailableActivities/Ava
 // Pages Profissional
 import MyOfferedActivities from './pages/ProfessionalDashboard/MyOfferedActivities/MyOfferedActivities';
 import ActivityForm from './pages/ProfessionalDashboard/ActivityForm/ActivityForm';
+import EnrolledStudents from './pages/ProfessionalDashboard/EnrolledStudents/EnrolledStudents';
 
 import './App.css';
 
@@ -69,6 +70,8 @@ function App() {
             <Route index element={<MyOfferedActivities />} />
             {/* NOVA ROTA AQUI: */}
             <Route path="nova-atividade" element={<ActivityForm />} />
+            {/* NOVA ROTA: */}
+            <Route path="inscritos" element={<EnrolledStudents />} />
           </Route>
 
         </Routes>
