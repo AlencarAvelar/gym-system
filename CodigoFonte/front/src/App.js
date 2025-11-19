@@ -9,6 +9,7 @@ import DashboardLayout from './layouts/DashboardLayout'; // <-- Importe o novo l
 // Pages Públicas
 import Login from './pages/Login/Login'; 
 import PasswordRecovery from './pages/PasswordRecovery/PasswordRecovery';
+import MyAppointments from './pages/ClientDashboard/MyAppointments/MyAppointments';
 
 import './App.css'; 
 
@@ -46,7 +47,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             
             {/* Esta será a página inicial do painel (/dashboard) */}
-            <Route index element={<div style={{color: '#333'}}><h1>Meus Agendamentos</h1><p>Aqui entrará a lista...</p></div>} />
+            <Route index element={<MyAppointments />} />
             
             {/* Outras páginas internas virão aqui depois, ex: */}
             {/* <Route path="atividades" element={<Atividades />} /> */}
