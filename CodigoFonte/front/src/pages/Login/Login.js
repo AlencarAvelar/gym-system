@@ -15,13 +15,14 @@ function Login() {
     event.preventDefault();
     setError('');
 
-    // LÓGICA MOCKADA:
     if (password === '123') {
-      navigate('/dashboard'); // Vai para o Cliente
+      navigate('/dashboard'); // Cliente
     } else if (password === '456') {
-      navigate('/profissional'); // <-- Vai para o Profissional!
+      navigate('/profissional'); // Profissional
+    } else if (password === 'admin') {
+      navigate('/admin'); // <-- NOVA ROTA: Admin
     } else {
-      setError('Tente "123" (Cliente) ou "456" (Profissional).');
+      setError('Senhas: "123" (Cliente), "456" (Profissional), "admin" (Admin).');
     }
   };
 

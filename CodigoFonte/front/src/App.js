@@ -19,6 +19,10 @@ import MyOfferedActivities from './pages/ProfessionalDashboard/MyOfferedActiviti
 import ActivityForm from './pages/ProfessionalDashboard/ActivityForm/ActivityForm';
 import EnrolledStudents from './pages/ProfessionalDashboard/EnrolledStudents/EnrolledStudents';
 
+// Pages Administrador
+import ActivityManagement from './pages/AdminDashboard/ActivityManagement/ActivityManagement';
+import ManageAppointments from './pages/AdminDashboard/ManageAppointments/ManageAppointments';
+
 import './App.css';
 
 function App() {
@@ -73,7 +77,15 @@ function App() {
             {/* NOVA ROTA: */}
             <Route path="inscritos" element={<EnrolledStudents />} />
           </Route>
+          {/* --- ROTAS PRIVADAS (Painel do Administrador) --- */}
+          <Route path="/admin" element={<DashboardLayout />}>
+            <Route index element={<ActivityManagement />} />
 
+            {/* NOVA ROTA AQUI: */}
+            <Route path="agendamentos" element={<ManageAppointments />} />
+
+            {/* <Route path="relatorios" element={<Reports />} /> */}
+          </Route>
         </Routes>
       </div>
     </Router>
