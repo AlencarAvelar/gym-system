@@ -16,6 +16,7 @@ import AvailableActivities from './pages/ClientDashboard/AvailableActivities/Ava
 
 // Pages Profissional
 import MyOfferedActivities from './pages/ProfessionalDashboard/MyOfferedActivities/MyOfferedActivities';
+import ActivityForm from './pages/ProfessionalDashboard/ActivityForm/ActivityForm';
 
 import './App.css';
 
@@ -59,14 +60,16 @@ function App() {
 
             {/* Outras páginas internas virão aqui depois, ex: */}
             {/* <Route path="atividades" element={<Atividades />} /> */}
-              
-            </Route>
 
-            {/* --- ROTAS PRIVADAS (Painel do Profissional) --- */}
-            {/* Vamos reusar o DashboardLayout por enquanto */}
-            <Route path="/profissional" element={<DashboardLayout />}>
-              <Route index element={<MyOfferedActivities />} />
-            </Route>
+          </Route>
+
+          {/* --- ROTAS PRIVADAS (Painel do Profissional) --- */}
+          {/* Vamos reusar o DashboardLayout por enquanto */}
+          <Route path="/profissional" element={<DashboardLayout />}>
+            <Route index element={<MyOfferedActivities />} />
+            {/* NOVA ROTA AQUI: */}
+            <Route path="nova-atividade" element={<ActivityForm />} />
+          </Route>
 
         </Routes>
       </div>
