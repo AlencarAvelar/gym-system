@@ -72,7 +72,7 @@ function ManageAppointments() {
               <th>Atividade</th>
               <th>Profissional</th>
               <th>Status</th>
-              <th>Ações</th>
+              {/* REMOVIDO: Coluna Ações */}
             </tr>
           </thead>
           <tbody>
@@ -91,14 +91,13 @@ function ManageAppointments() {
                       {item.status}
                     </span>
                   </td>
-                  <td>
-                    <button className="action-btn" title="Cancelar Agendamento">🗑️</button>
-                  </td>
+                  {/* REMOVIDO: Botão de Excluir */}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-data">Nenhum agendamento encontrado.</td>
+                {/* Ajustei o colSpan para 5, já que agora temos 5 colunas */}
+                <td colSpan="5" className="no-data">Nenhum agendamento encontrado.</td>
               </tr>
             )}
           </tbody>

@@ -22,6 +22,7 @@ import EnrolledStudents from './pages/ProfessionalDashboard/EnrolledStudents/Enr
 // Pages Administrador
 import ActivityManagement from './pages/AdminDashboard/ActivityManagement/ActivityManagement';
 import ManageAppointments from './pages/AdminDashboard/ManageAppointments/ManageAppointments';
+import Reports from './pages/AdminDashboard/Reports/Reports';
 
 import './App.css';
 
@@ -85,6 +86,7 @@ function App() {
             <Route path="agendamentos" element={<ManageAppointments />} />
 
             {/* <Route path="relatorios" element={<Reports />} /> */}
+            <Route path="relatorios" element={<Reports />} />
           </Route>
         </Routes>
       </div>

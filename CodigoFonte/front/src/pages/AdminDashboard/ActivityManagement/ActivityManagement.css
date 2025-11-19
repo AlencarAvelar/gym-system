@@ -1,33 +1,56 @@
-/* Reutilize o CSS de AvailableActivities ou crie um arquivo shared.css se preferir. 
-   Aqui estou colando o essencial com as modificações do Admin */
-
 .admin-activities-container { width: 100%; }
 
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.page-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 2rem; 
+  flex-wrap: wrap; 
+  gap: 1rem; 
+}
 .page-header h1 { font-size: 1.8rem; color: #333; margin: 0; }
 
-/* Filtros (Igual ao anterior) */
-.filters-wrapper { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+/* Botão de Nova Atividade */
+.btn-new-activity {
+  background-color: #28a745; /* Verde Sucesso */
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-new-activity:hover { background-color: #218838; }
+
+/* Wrapper dos filtros separado para dar espaço */
+.filters-wrapper-admin { 
+  display: flex; 
+  gap: 1rem; 
+  align-items: center; 
+  flex-wrap: wrap;
+  margin-bottom: 2rem; /* Espaço antes do grid */
+}
+
+/* Reutilização dos estilos anteriores */
 .search-box { position: relative; display: flex; align-items: center; width: 300px; }
 .search-box input { width: 100%; padding: 0.6rem 2.5rem 0.6rem 1rem; border: 1px solid #ddd; border-radius: 25px; outline: none; }
-.search-box input:focus { border-color: #6f42c1; box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15); } /* Roxo Admin */
+.search-box input:focus { border-color: #6f42c1; box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15); }
 .search-icon { position: absolute; right: 12px; color: #888; }
 
 .filter-controls { display: flex; background: #f1f3f5; padding: 0.25rem; border-radius: 25px; border: 1px solid #eee; }
 .filter-btn { background: transparent; border: none; padding: 0.4rem 1.2rem; border-radius: 20px; cursor: pointer; color: #666; font-weight: 600; transition: all 0.2s; }
-.filter-btn.active { background: #fff; color: #6f42c1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); } /* Roxo Admin */
+.filter-btn.active { background: #fff; color: #6f42c1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-/* Grid */
 .activities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
 
-/* Card do Admin */
 .activity-card.admin-card {
   background: white;
   border-radius: 10px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   border: 1px solid #eee;
-  border-top: 4px solid #6f42c1; /* Borda Roxa no Topo */
+  border-top: 4px solid #6f42c1;
   display: flex; flex-direction: column; gap: 1rem;
 }
 
@@ -37,7 +60,6 @@
 .tag.aula { background-color: #f3e5f5; color: #7b1fa2; }
 
 .vacancies-info { color: #666; font-size: 0.85rem; font-weight: 500; }
-
 .card-body h3 { margin: 0; font-size: 1.2rem; color: #222; }
 .professional-highlight { color: #333; margin: 0.5rem 0; font-size: 0.95rem; background: #f8f9fa; padding: 0.3rem; border-radius: 4px; }
 .time-badge { background-color: #fafafa; border: 1px solid #eee; padding: 0.6rem; border-radius: 6px; text-align: center; font-weight: 600; color: #444; }
@@ -46,3 +68,32 @@
 .card-actions button { flex: 1; padding: 0.6rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; }
 .btn-edit { background-color: #e9ecef; color: #495057; }
 .btn-cancel { background-color: #ffe3e3; color: #c92a2a; }
+
+/* Estilo extra para selects dentro do modal */
+.modal-form-group select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+}
+
+/* --- Estilos para o Modal --- */
+.modal-textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.modal-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-row .modal-form-group {
+  flex: 1;
+}
