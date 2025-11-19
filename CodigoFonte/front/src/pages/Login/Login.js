@@ -12,26 +12,26 @@ function Login() {
 
   // Função que roda ao clicar em "Entrar"
   const handleSubmit = (event) => {
-    event.preventDefault(); // Impede a página de recarregar
-    setError(''); // Limpa erros antigos
+    event.preventDefault();
+    setError('');
 
-    // --- SIMULAÇÃO DE LOGIN ---
-    // Se a senha for "123", entra no painel.
+    // LÓGICA MOCKADA:
     if (password === '123') {
-      console.log('Login autorizado para:', email);
-      navigate('/dashboard'); // <-- Mágica: Redireciona para a área interna
+      navigate('/dashboard'); // Vai para o Cliente
+    } else if (password === '456') {
+      navigate('/profissional'); // <-- Vai para o Profissional!
     } else {
-      setError('Senha incorreta. Tente "123" para testar.');
+      setError('Tente "123" (Cliente) ou "456" (Profissional).');
     }
   };
 
   return (
     // 'login-page' agora é nossa "Seção Hero"
-    <div className="login-page"> 
-      
+    <div className="login-page">
+
       {/* Novo container para o layout de 2 colunas */}
       <div className="login-content">
-        
+
         {/* Coluna 1: O "Chamariz" */}
         <div className="attention-text">
           <h1>Transforme seu corpo.</h1>
@@ -45,31 +45,31 @@ function Login() {
 
           {/* Exibe mensagem de erro se houver */}
           {error && <p className="login-error-message">{error}</p>}
-          
+
           <div className="input-group">
             <label htmlFor="email">Email:</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="seuemail@exemplo.com" 
-              required 
+            <input
+              type="email"
+              id="email"
+              placeholder="seuemail@exemplo.com"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)} // Atualiza o estado
             />
           </div>
-          
+
           <div className="input-group">
             <label htmlFor="password">Senha:</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="Sua senha" 
-              required 
+            <input
+              type="password"
+              id="password"
+              placeholder="Sua senha"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)} // Atualiza o estado
             />
           </div>
-          
+
           <button type="submit" className="login-button">Entrar</button>
 
           <div className="login-links">
@@ -77,7 +77,7 @@ function Login() {
           </div>
         </form>
       </div>
-      
+
     </div>
   );
 }

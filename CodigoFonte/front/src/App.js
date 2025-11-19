@@ -2,26 +2,29 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Layouts
-import Header from './components/Header/Header'; 
-import Footer from './components/Footer/Footer'; 
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
 import DashboardLayout from './layouts/DashboardLayout'; // <-- Importe o novo layout
 
 // Pages Públicas
-import Login from './pages/Login/Login'; 
+import Login from './pages/Login/Login';
 import PasswordRecovery from './pages/PasswordRecovery/PasswordRecovery';
 
-// Page Cliente
+// Pages Cliente
 import MyAppointments from './pages/ClientDashboard/MyAppointments/MyAppointments';
 import AvailableActivities from './pages/ClientDashboard/AvailableActivities/AvailableActivities';
 
-import './App.css'; 
+// Pages Profissional
+import MyOfferedActivities from './pages/ProfessionalDashboard/MyOfferedActivities/MyOfferedActivities';
+
+import './App.css';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          
+
           {/* --- ROTAS PÚBLICAS (Com Header/Footer da Home) --- */}
           <Route path="/" element={
             <>
@@ -29,8 +32,8 @@ function App() {
               <Login />
               {/* Seção Dummy */}
               <div id="sobre-section" className="dummy-section">
-                  {/* ... seu texto ... */}
-                  <p>Descubra um novo jeito de treinar...</p>
+                {/* ... seu texto ... */}
+                <p>Descubra um novo jeito de treinar...</p>
               </div>
               <Footer />
             </>
@@ -48,16 +51,22 @@ function App() {
           {/* --- ROTAS PRIVADAS (Painel do Cliente) --- */}
           {/* Aqui usamos o DashboardLayout como "Pai" */}
           <Route path="/dashboard" element={<DashboardLayout />}>
-            
+
             {/* Esta será a página inicial do painel (/dashboard) */}
             <Route index element={<MyAppointments />} />
             {/* NOVA ROTA ADICIONADA: */}
             <Route path="atividades" element={<AvailableActivities />} />
-            
+
             {/* Outras páginas internas virão aqui depois, ex: */}
             {/* <Route path="atividades" element={<Atividades />} /> */}
-          
-          </Route>
+              
+            </Route>
+
+            {/* --- ROTAS PRIVADAS (Painel do Profissional) --- */}
+            {/* Vamos reusar o DashboardLayout por enquanto */}
+            <Route path="/profissional" element={<DashboardLayout />}>
+              <Route index element={<MyOfferedActivities />} />
+            </Route>
 
         </Routes>
       </div>
