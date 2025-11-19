@@ -1,0 +1,163 @@
+.manage-appointments-container {
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* --- Barra de Filtros --- */
+.filters-bar {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.search-box-admin {
+  position: relative;
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-box-admin input {
+  width: 100%;
+  /* CORREÇÃO 1: Aumentei o padding da direita para 3.5rem */
+  padding: 0.7rem 3.5rem 0.7rem 1rem; 
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+}
+
+.search-box-admin input:focus {
+  border-color: #6f42c1; /* Roxo Admin */
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  /* CORREÇÃO 2: Afastei o ícone um pouco mais da borda */
+  right: 15px; 
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  pointer-events: none;
+}
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.date-filter input {
+  /* CORREÇÃO 3: Ajustei o padding para 0.7rem para alinhar a altura com a busca */
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  color: #555;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.date-filter input:focus {
+  border-color: #6f42c1; /* Foco roxo também na data */
+  box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+/* --- Tabela Admin --- */
+.table-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+  border: 1px solid #eee;
+  margin-top: 1.5rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #6f42c1; /* Linha Roxa do Admin */
+}
+
+.admin-table th {
+  padding: 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.admin-table td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px solid #f1f1f1;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f9f9ff;
+}
+
+/* Colunas Específicas */
+.td-datetime { line-height: 1.2; }
+.small-time { font-size: 0.8rem; color: #888; }
+.td-bold { font-weight: 600; }
+
+/* Status Badges */
+.status-badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.status-badge.confirmado { background-color: #d4edda; color: #155724; }
+.status-badge.pendente { background-color: #fff3cd; color: #856404; }
+.status-badge.cancelado { background-color: #f8d7da; color: #721c24; }
+
+.action-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.action-btn:hover { opacity: 1; transform: scale(1.1); }
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+  font-style: italic;
+}

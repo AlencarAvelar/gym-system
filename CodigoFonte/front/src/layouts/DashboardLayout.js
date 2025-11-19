@@ -1,37 +1,48 @@
 import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom'; // Importe useLocation
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import './DashboardLayout.css';
 
 function DashboardLayout() {
   const location = useLocation();
   
-  // Verifica se estamos na rota de profissional
   const isProfessional = location.pathname.includes('/profissional');
+  const isAdmin = location.pathname.includes('/admin'); // <-- NOVO
+
+  // Define o título da área com base na rota
+  let areaTitle = "Área do Cliente";
+  if (isProfessional) areaTitle = "Área do Profissional";
+  if (isAdmin) areaTitle = "Área Administrativa";
 
   return (
     <div className="dashboard-container">
-      {/* --- BARRA SUPERIOR --- */}
       <header className="dashboard-header">
         <div className="header-left">
           <h1 className="logo-small">GYM<span>SYSTEM</span></h1>
-          {/* Uma etiqueta visual para ajudar a saber onde estamos */}
-          <span className="portal-badge">
-            {isProfessional ? "Área do Profissional" : "Área do Cliente"}
-          </span>
+          <span className="portal-badge">{areaTitle}</span>
         </div>
         
         <nav className="dashboard-nav">
           
-          {/* MENU DINÂMICO */}
-          {isProfessional ? (
-            // --- LINKS DO PROFESSOR ---
+          {/* --- MENU DO ADMIN --- */}
+          {isAdmin && (
+            <>
+              <Link to="/admin" className="nav-item">Gerenciar Atividades</Link>
+              <Link to="/admin/agendamentos" className="nav-item">Gerenciar Agendamentos</Link>
+              <Link to="/admin/relatorios" className="nav-item">Relatórios</Link>
+            </>
+          )}
+
+          {/* --- MENU DO PROFESSOR --- */}
+          {isProfessional && (
             <>
               <Link to="/profissional" className="nav-item">Minhas Aulas</Link>
               <Link to="/profissional/nova-atividade" className="nav-item highlight">+ Nova Atividade</Link>
               <Link to="/profissional/inscritos" className="nav-item">Inscritos</Link>
             </>
-          ) : (
-            // --- LINKS DO CLIENTE ---
+          )}
+
+          {/* --- MENU DO CLIENTE (Se não for nem Admin nem Pro) --- */}
+          {!isAdmin && !isProfessional && (
             <>
               <Link to="/dashboard" className="nav-item">Meus Agendamentos</Link>
               <Link to="/dashboard/atividades" className="nav-item">Agendar Aula</Link>
@@ -40,7 +51,7 @@ function DashboardLayout() {
           
           <div className="user-info">
             <span className="user-name">
-              {isProfessional ? "Olá, Professor" : "Olá, Cliente"}
+              {isAdmin ? "Olá, Administrador" : (isProfessional ? "Olá, Professor" : "Olá, Cliente")}
             </span>
             <Link to="/" className="logout-btn">Sair</Link>
           </div>
@@ -52,7 +63,7 @@ function DashboardLayout() {
       </main>
 
       <footer className="dashboard-footer">
-        <p>&copy; 2025 Gym System - {isProfessional ? "Painel Administrativo" : "Painel do Aluno"}</p>
+        <p>&copy; 2025 Gym System - Painel de Controle</p>
       </footer>
     </div>
   );
