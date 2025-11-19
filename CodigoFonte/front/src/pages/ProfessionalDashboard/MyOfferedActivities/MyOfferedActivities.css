@@ -1,0 +1,71 @@
+/* A base é a mesma do AvailableActivities.css, 
+   então aproveitamos muitas classes globais se tivéssemos um arquivo shared. 
+   Como não temos, copiamos e adaptamos: */
+
+.offered-activities-container {
+  width: 100%;
+}
+
+/* Reuse os estilos de Header e Filtros que você já tem */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.page-header h1 { font-size: 1.8rem; color: #333; margin: 0; }
+
+/* Wrappers de Filtro (Igual ao do cliente) */
+.filters-wrapper { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.search-box { position: relative; display: flex; align-items: center; width: 300px; }
+.search-box input { width: 100%; padding: 0.6rem 2.5rem 0.6rem 1rem; border: 1px solid #ddd; border-radius: 25px; outline: none; }
+.search-box input:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); }
+.search-icon { position: absolute; right: 12px; color: #888; }
+
+.filter-controls { display: flex; background: #f1f3f5; padding: 0.25rem; border-radius: 25px; border: 1px solid #eee; }
+.filter-btn { background: transparent; border: none; padding: 0.4rem 1.2rem; border-radius: 20px; cursor: pointer; color: #666; font-weight: 600; transition: all 0.2s; }
+.filter-btn:hover { background-color: rgba(0,0,0,0.05); }
+.filter-btn.active { background: #fff; color: #007bff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+/* Grid */
+.activities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* O Card do Profissional */
+.activity-card.pro-card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  /* Diferencial visual: Borda laranja na esquerda para o Profissional */
+  border-left: 5px solid #fd7e14; 
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card-header { display: flex; justify-content: space-between; font-size: 0.8rem; }
+.tag { padding: 0.25rem 0.7rem; border-radius: 20px; text-transform: uppercase; font-weight: 700; font-size: 0.7rem; }
+.tag.treino { background-color: #fff3e0; color: #e65100; } /* Cores mais quentes pro Pro */
+.tag.aula { background-color: #e0f2f1; color: #00695c; }
+
+.vacancies-info { color: #666; font-size: 0.85rem; font-weight: 500; }
+
+.card-body h3 { margin: 0; font-size: 1.2rem; color: #222; }
+.time-badge { background-color: #fafafa; border: 1px solid #eee; padding: 0.6rem; border-radius: 6px; text-align: center; font-weight: 600; color: #444; margin-top: 0.5rem;}
+
+.card-actions { margin-top: auto; display: flex; gap: 0.5rem; }
+.card-actions button { flex: 1; padding: 0.6rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+
+.btn-edit { background-color: #e9ecef; color: #495057; }
+.btn-edit:hover { background-color: #dee2e6; }
+
+.btn-cancel { background-color: #ffe3e3; color: #c92a2a; }
+.btn-cancel:hover { background-color: #ffc9c9; }

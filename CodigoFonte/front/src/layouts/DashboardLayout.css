@@ -93,3 +93,29 @@
   background-color: #fff;
   border-top: 1px solid #e0e0e0;
 }
+
+/* Etiqueta pequena ao lado do logo */
+.portal-badge {
+  margin-left: 1rem;
+  background-color: #333;
+  color: #aaa;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid #444;
+}
+
+/* Destaque para o botão de Nova Atividade */
+.nav-item.highlight {
+  color: #4dabf7; /* Azul claro */
+  border: 1px solid #4dabf7;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+
+.nav-item.highlight:hover {
+  background-color: #4dabf7;
+  color: #000;
+}
