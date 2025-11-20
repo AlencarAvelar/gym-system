@@ -1,0 +1,120 @@
+/* O fundo escuro que cobre a tela inteira */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Preto transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Fica em cima de tudo */
+  backdrop-filter: blur(3px); /* Desfoque suave no fundo */
+}
+
+/* A caixinha branca do modal */
+.modal-container {
+  background: white;
+  width: 90%;
+  max-width: 500px; /* Largura máxima */
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Cabeçalho (Título + X) */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+/* Conteúdo interno */
+.modal-content {
+  padding: 1.5rem;
+}
+
+/* --- Classes Utilitárias para usar DENTRO dos modais --- */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-confirm {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-confirm:hover { background-color: #0056b3; }
+
+.btn-danger {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #dc3545; /* Vermelho */
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-danger:hover { background-color: #a71d2a; }
+
+.btn-cancel-modal {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-cancel-modal:hover { background-color: #f0f0f0; }
+
+.modal-form-group {
+  margin-bottom: 1rem;
+}
+.modal-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+}
+.modal-form-group input {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Importante para não estourar */
+}
