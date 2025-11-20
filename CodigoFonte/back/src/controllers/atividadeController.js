@@ -21,7 +21,7 @@ class AtividadeController {
     }
   }
 
-  // [RF003] Consultar atividades
+  // [RF003] Consultar todas as atividades
   static async getAll(req, res) {
     try {
       const atividades = await AtividadeModel.findAll();
@@ -160,7 +160,7 @@ class AtividadeController {
     }
   }
 
-  // Buscar atividades disponíveis (com vagas)
+  // Consultar atividades disponíveis
   static async getAvailable(req, res) {
     try {
       const atividades = await AtividadeModel.findAvailable();

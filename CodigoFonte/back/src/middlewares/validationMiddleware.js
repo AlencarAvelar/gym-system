@@ -1,4 +1,4 @@
-// Middleware para validação de dados da atividade
+// Middleware para validação de dados da atividade (Criação - RF002)
 const validateAtividade = (req, res, next) => {
   const { nome_atividade, tipo_atividade, descricao, duracao, capacidade_max, id_profissional } = req.body;
   
@@ -40,7 +40,7 @@ const validateAtividade = (req, res, next) => {
   next();
 };
 
-// Middleware para validação de atualização
+// Middleware para validação de atualização (Atualização - RF004)
 const validateAtividadeUpdate = (req, res, next) => {
   const { nome_atividade, tipo_atividade, descricao, duracao, capacidade_max } = req.body;
   
