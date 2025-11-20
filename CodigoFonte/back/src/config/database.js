@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
+  host: process.env.DB_HOST, // <--- CORRIGIDO
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -15,7 +15,6 @@ pool.on('connect', () => {
 
 pool.on('error', (err) => {
   console.error('❌ Erro na conexão com o banco de dados:', err);
-  process.exit(-1);
 });
 
 module.exports = pool;

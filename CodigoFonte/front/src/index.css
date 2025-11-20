@@ -1,3 +1,14 @@
+/* Adiciona o scroll suave para todo o site */
+html {
+  scroll-behavior: smooth;
+}
+
+/* O resto do seu index.css (como o 'body') */
+body {
+  margin: 0;
+  /* ... etc ... */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

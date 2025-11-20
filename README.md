@@ -1,9 +1,11 @@
 # 🏋️ Sistema de Agendamento para Academia
 
 ## 📌 Descrição do Problema
+
 As academias enfrentam dificuldades na organização de horários de aulas e treinos, principalmente quando o agendamento ocorre de forma manual ou presencial. Isso causa conflitos de horários, falta de controle de vagas e sobrecarga na administração. Professores e personal trainers também possuem pouca visibilidade da ocupação de suas aulas/treinos, o que dificulta seu planejamento.
 
 ## ✅ Descrição da Solução
+
 A proposta é desenvolver um sistema web que permitirá automatizar o processo de agendamento de treinos e aulas. O sistema contará com diferentes níveis de acesso:
 
 - **Administrador**: gerenciamento geral do sistema (usuários, horários, aulas e relatórios)

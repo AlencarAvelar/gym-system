@@ -1,0 +1,16 @@
+.main-footer {
+  /* Fundo escuro, mas não transparente */
+  background-color: #111;
+  color: #aaa;
+  padding: 2rem 5%;
+  border-top: 1px solid #333;
+}
+
+.footer-content {
+  display: flex;
+  /* MUDANÇA: Trocamos 'space-between' por 'center' */
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* Para telas menores */
+  gap: 1rem;
+}

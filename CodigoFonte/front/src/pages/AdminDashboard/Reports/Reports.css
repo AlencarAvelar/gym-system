@@ -1,0 +1,90 @@
+.reports-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Filtros */
+.report-filters {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  margin-bottom: 2rem;
+}
+
+.filters-form {
+  display: flex;
+  align-items: flex-end; /* Alinha o botão com a parte de baixo dos inputs */
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label { font-weight: 600; color: #555; font-size: 0.9rem; }
+.form-group input { padding: 0.7rem; border: 1px solid #ddd; border-radius: 6px; }
+
+.btn-generate {
+  padding: 0.75rem 1.5rem;
+  background-color: #6f42c1; /* Roxo Admin */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-generate:hover { background-color: #59359a; }
+
+/* Resumo */
+.summary-cards {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  flex: 1;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  text-align: center;
+  border: 1px solid #eee;
+}
+.summary-card h3 { margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #666; text-transform: uppercase; }
+.summary-card p { margin: 0; font-size: 2.5rem; font-weight: 800; color: #333; }
+
+.summary-card.blue { border-bottom: 4px solid #007bff; }
+.summary-card.green { border-bottom: 4px solid #28a745; }
+
+/* Tabela */
+.results-table-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.report-table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 2rem; }
+.report-table th { padding: 1rem; background-color: #f8f9fa; color: #555; }
+.report-table td { padding: 1rem; border-bottom: 1px solid #eee; }
+
+.badge { padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.badge.aula { background: #f3e5f5; color: #7b1fa2; }
+.badge.treino { background: #e3f2fd; color: #1976d2; }
+
+.btn-print { background: #eee; border: none; padding: 0.6rem 1.2rem; border-radius: 5px; cursor: pointer; color: #333; font-weight: 600; float: right; }
+.btn-print:hover { background: #ddd; }
+
+/* Esconde o resto do site na impressão */
+@media print {
+  .dashboard-header, .dashboard-nav, .dashboard-footer, .report-filters, .btn-print { display: none; }
+  .dashboard-container { background: white; }
+}
