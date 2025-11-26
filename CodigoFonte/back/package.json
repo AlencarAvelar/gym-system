@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.11",
+    "pg": "^8.16.3"
+  },
+  "name": "gym-system",
+  "version": "1.0.0",
+  "description": "backend do projeto gym-system",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlencarAvelar/gym-system.git"
+  },
+  "author": "AlencarAvelar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlencarAvelar/gym-system/issues"
+  },
+  "homepage": "https://github.com/AlencarAvelar/gym-system#readme"
+}
