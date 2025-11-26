@@ -1,6 +1,13 @@
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+
+const agendamentoRoutes = require('./routes/agendamentoRoutes');
+
+
+
+
 
 const atividadeRoutes = require('./routes/atividadeRoutes');
 
@@ -18,6 +25,7 @@ app.get('/', (req, res) => {
 
 // Rotas da API
 app.use('/api/atividades', atividadeRoutes);
+app.use('/api/agendamentos', agendamentoRoutes);
 
 // ...
 module.exports = app;
