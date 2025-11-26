@@ -1,46 +1,80 @@
-import React, { useState } from 'react';
-import Modal from '../../../components/Modal/Modal'; // <-- Importe o Modal
+import React, { useState, useEffect } from 'react';
+import Modal from '../../../components/Modal/Modal';
+import { getMyAppointments, deleteAppointment, updateAppointment } from '../../../services/appointmentService'; // Importa o serviço
 import './MyAppointments.css';
 
 function MyAppointments() {
-  // Mock Data
-  const [appointments, setAppointments] = useState([ // <-- Agora é um STATE para podermos excluir visualmente
-    { id: 1, activity: "Musculação", type: "Treino", professional: "Carlos Silva", date: "20/11/2025", time: "14:00", vacancies: "15/30" },
-    { id: 2, activity: "Yoga Matinal", type: "Aula", professional: "Ana Souza", date: "21/11/2025", time: "08:00", vacancies: "8/10" },
-    { id: 3, activity: "Crossfit", type: "Aula", professional: "Roberto Lima", date: "22/11/2025", time: "18:30", vacancies: "20/20" }
-  ]);
+  const [appointments, setAppointments] = useState([]); // Começa vazio
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+
+  // --- CARREGAR DADOS (GET) ---
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await getMyAppointments();
+      setAppointments(data);
+    } catch (error) {
+      console.error("Erro ao carregar agendamentos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --- ESTADOS DOS MODAIS ---
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null); // Guarda qual item foi clicado
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // --- AÇÕES ---
+  // --- AÇÕES (DELETE) ---
   const handleOpenDelete = (item) => {
     setSelectedAppointment(item);
     setDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    // Simula a exclusão removendo da lista visualmente
+  const handleConfirmDelete = async () => {
+    if (!selectedAppointment) return;
+    
+    // Chama o serviço para deletar
+    await deleteAppointment(selectedAppointment.id);
+    
+    // Atualiza a lista localmente (ou recarrega tudo com loadData())
     setAppointments(appointments.filter(a => a.id !== selectedAppointment.id));
+    
     setDeleteModalOpen(false);
     setSelectedAppointment(null);
     alert("Agendamento excluído com sucesso!");
   };
 
+  // --- AÇÕES (UPDATE) ---
   const handleOpenEdit = (item) => {
-    setSelectedAppointment(item);
+    setSelectedAppointment({ ...item }); // Cria uma cópia para edição
     setEditModalOpen(true);
   };
 
-  const handleConfirmEdit = (e) => {
+  const handleConfirmEdit = async (e) => {
     e.preventDefault();
-    // Aqui futuramente chamaremos a API de atualização
-    alert(`Agendamento atualizado para: ${selectedAppointment.date} às ${selectedAppointment.time}`);
+    
+    // Chama o serviço para atualizar
+    await updateAppointment(selectedAppointment);
+
+    // Atualiza a lista localmente
+    setAppointments(appointments.map(a => 
+      a.id === selectedAppointment.id ? selectedAppointment : a
+    ));
+
     setEditModalOpen(false);
     setSelectedAppointment(null);
+    alert("Agendamento atualizado!");
   };
+
+  // --- RENDERIZAÇÃO ---
+  if (loading) {
+    return <div className="appointments-container"><p>Carregando seus agendamentos...</p></div>;
+  }
 
   return (
     <div className="appointments-container">
@@ -49,27 +83,30 @@ function MyAppointments() {
       </div>
 
       <div className="appointments-grid">
-        {appointments.map((item) => (
-          <div key={item.id} className="appointment-card">
-            <div className="card-header">
-              <span className={`tag ${item.type.toLowerCase()}`}>{item.type}</span>
-              <span className="vacancies-info">Vagas: {item.vacancies}</span>
-            </div>
-            <div className="card-body">
-              <h3>{item.activity}</h3>
-              <p className="professional">Profissional: {item.professional}</p>
-              <div className="datetime-info">
-                <div className="info-item"><strong>Data:</strong> {item.date}</div>
-                <div className="info-item"><strong>Horário:</strong> {item.time}</div>
+        {appointments.length > 0 ? (
+          appointments.map((item) => (
+            <div key={item.id} className="appointment-card">
+              <div className="card-header">
+                <span className={`tag ${item.type.toLowerCase()}`}>{item.type}</span>
+                <span className="vacancies-info">Vagas: {item.vacancies}</span>
+              </div>
+              <div className="card-body">
+                <h3>{item.activity}</h3>
+                <p className="professional">Profissional: {item.professional}</p>
+                <div className="datetime-info">
+                  <div className="info-item"><strong>Data:</strong> {item.date}</div>
+                  <div className="info-item"><strong>Horário:</strong> {item.time}</div>
+                </div>
+              </div>
+              <div className="card-actions">
+                <button className="btn-edit" onClick={() => handleOpenEdit(item)}>Editar</button>
+                <button className="btn-cancel" onClick={() => handleOpenDelete(item)}>Excluir</button>
               </div>
             </div>
-            <div className="card-actions">
-              {/* Botões agora abrem os modais */}
-              <button className="btn-edit" onClick={() => handleOpenEdit(item)}>Editar</button>
-              <button className="btn-cancel" onClick={() => handleOpenDelete(item)}>Excluir</button>
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p>Você ainda não tem agendamentos.</p>
+        )}
       </div>
 
       {/* --- MODAL DE EXCLUSÃO --- */}

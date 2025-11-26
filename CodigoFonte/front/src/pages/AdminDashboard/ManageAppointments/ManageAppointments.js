@@ -1,43 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAllAppointments } from '../../../services/adminService'; // Importa o serviço
 import './ManageAppointments.css';
 
 function ManageAppointments() {
-  // --- MOCK DATA (Visão de TODOS os agendamentos do sistema) ---
-  const allAppointments = [
-    { id: 1, date: "2025-11-20", time: "08:00", activity: "Musculação", client: "Ana Beatriz", professional: "João Paulo", status: "Confirmado" },
-    { id: 2, date: "2025-11-20", time: "09:00", activity: "Pilates Solo", client: "Carlos Eduardo", professional: "Maria Clara", status: "Confirmado" },
-    { id: 3, date: "2025-11-20", time: "14:00", activity: "Avaliação Física", client: "Roberto Justus", professional: "Dra. Fernanda", status: "Pendente" },
-    { id: 4, date: "2025-11-21", time: "18:30", activity: "Crossfit", client: "Julia Roberts", professional: "Roberto Lima", status: "Cancelado" },
-    { id: 5, date: "2025-11-22", time: "10:00", activity: "Yoga", client: "Michael Scott", professional: "Maria Clara", status: "Confirmado" },
-  ];
+  const [allAppointments, setAllAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // --- CARREGAR DADOS ---
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getAllAppointments();
+        setAllAppointments(data);
+      } catch (error) {
+        console.error("Erro ao buscar agendamentos", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
 
   // Lógica de Filtragem Avançada
   const filteredList = allAppointments.filter(item => {
-    // 1. Filtro de Texto (Busca em Cliente, Atividade ou Profissional)
+    // 1. Filtro de Texto
     const searchLower = searchTerm.toLowerCase();
     const matchesText = 
       item.client.toLowerCase().includes(searchLower) ||
       item.activity.toLowerCase().includes(searchLower) ||
       item.professional.toLowerCase().includes(searchLower);
 
-    // 2. Filtro de Data (Se estiver vazio, ignora)
+    // 2. Filtro de Data
     const matchesDate = dateFilter ? item.date === dateFilter : true;
 
     return matchesText && matchesDate;
   });
+
+  if (loading) {
+    return <div className="manage-appointments-container"><p>Carregando agendamentos...</p></div>;
+  }
 
   return (
     <div className="manage-appointments-container">
       <div className="page-header">
         <h1>Gerenciamento de Agendamentos</h1>
         
-        {/* Área de Filtros */}
         <div className="filters-bar">
-          
-          {/* Busca Textual */}
           <div className="search-box-admin">
             <input 
               type="text" 
@@ -48,7 +59,6 @@ function ManageAppointments() {
             <span className="search-icon">🔍</span>
           </div>
 
-          {/* Filtro de Data */}
           <div className="date-filter">
             <label>Data:</label>
             <input 
@@ -58,11 +68,9 @@ function ManageAppointments() {
             />
             {dateFilter && <button className="clear-btn" onClick={() => setDateFilter('')}>Limpar</button>}
           </div>
-
         </div>
       </div>
 
-      {/* Tabela Global */}
       <div className="table-container">
         <table className="admin-table">
           <thead>
@@ -72,7 +80,6 @@ function ManageAppointments() {
               <th>Atividade</th>
               <th>Profissional</th>
               <th>Status</th>
-              {/* REMOVIDO: Coluna Ações */}
             </tr>
           </thead>
           <tbody>
@@ -91,12 +98,10 @@ function ManageAppointments() {
                       {item.status}
                     </span>
                   </td>
-                  {/* REMOVIDO: Botão de Excluir */}
                 </tr>
               ))
             ) : (
               <tr>
-                {/* Ajustei o colSpan para 5, já que agora temos 5 colunas */}
                 <td colSpan="5" className="no-data">Nenhum agendamento encontrado.</td>
               </tr>
             )}
