@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
-import Modal from '../../../components/Modal/Modal'; // Reutilizando nosso Modal!
+import React, { useState, useEffect } from 'react';
+import Modal from '../../../components/Modal/Modal';
+import { getMyOfferedActivities, deleteOfferedActivity, updateOfferedActivity } from '../../../services/professionalService'; // Importa o serviço
 import './MyOfferedActivities.css';
 
 function MyOfferedActivities() {
-  // --- MOCK DATA (Atividades criadas por ESTE professor) ---
-  const [myActivities, setMyActivities] = useState([
-    { id: 1, name: "Treino Funcional A", type: "Aula", time: "08:00", vacancies: "12/15" },
-    { id: 2, name: "Avaliação Física", type: "Treino", time: "10:00 - 12:00", vacancies: "Livre" },
-    { id: 3, name: "Crossfit Iniciante", type: "Aula", time: "18:30", vacancies: "20/20" }
-  ]);
+  const [myActivities, setMyActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // --- CARREGAR DADOS ---
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const data = await getMyOfferedActivities();
+      setMyActivities(data);
+    } catch (error) {
+      console.error("Erro ao carregar atividades", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Estados para filtros e modais
   const [filterType, setFilterType] = useState('Todos');
@@ -26,28 +39,58 @@ function MyOfferedActivities() {
   });
 
   // --- AÇÕES ---
+  
+  // 1. Excluir
   const handleDelete = (activity) => {
     setSelectedActivity(activity);
     setDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    // Chama o serviço
+    await deleteOfferedActivity(selectedActivity.id);
+    
+    // Atualiza lista local
     setMyActivities(myActivities.filter(a => a.id !== selectedActivity.id));
+    
     setDeleteModalOpen(false);
     alert("Atividade excluída com sucesso!");
   };
 
+  // 2. Editar
   const handleEdit = (activity) => {
-    setSelectedActivity(activity);
+    setSelectedActivity({ ...activity }); // Cópia
     setEditModalOpen(true);
   };
+
+  const confirmEdit = async () => {
+    // Chama o serviço
+    await updateOfferedActivity(selectedActivity);
+
+    // Atualiza lista local
+    setMyActivities(myActivities.map(a => 
+      a.id === selectedActivity.id ? selectedActivity : a
+    ));
+
+    setEditModalOpen(false);
+    alert("Atividade editada com sucesso!");
+  };
+
+  // Handler genérico para inputs do modal de edição
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSelectedActivity(prev => ({ ...prev, [name]: value }));
+  };
+
+  if (loading) {
+    return <div className="offered-activities-container"><p>Carregando suas aulas...</p></div>;
+  }
 
   return (
     <div className="offered-activities-container">
       <div className="page-header">
         <h1>Minhas Atividades Ofertadas</h1>
         
-        {/* Filtros (Seguindo o padrão que já criamos) */}
         <div className="filters-wrapper">
           <div className="search-box">
             <input 
@@ -101,7 +144,7 @@ function MyOfferedActivities() {
         </div>
       </Modal>
 
-      {/* --- MODAL DE EDIÇÃO (Simples) --- */}
+      {/* --- MODAL DE EDIÇÃO --- */}
       <Modal 
         isOpen={isEditModalOpen} 
         onClose={() => setEditModalOpen(false)}
@@ -109,15 +152,15 @@ function MyOfferedActivities() {
       >
         <div className="modal-form-group">
           <label>Nome da Atividade:</label>
-          <input type="text" defaultValue={selectedActivity?.name} />
+          <input type="text" name="name" defaultValue={selectedActivity?.name} onChange={handleChange} />
         </div>
         <div className="modal-form-group">
           <label>Horário:</label>
-          <input type="text" defaultValue={selectedActivity?.time} />
+          <input type="text" name="time" defaultValue={selectedActivity?.time} onChange={handleChange} />
         </div>
         <div className="modal-actions">
           <button className="btn-cancel-modal" onClick={() => setEditModalOpen(false)}>Cancelar</button>
-          <button className="btn-confirm" onClick={() => {alert('Editado!'); setEditModalOpen(false);}}>Salvar</button>
+          <button className="btn-confirm" onClick={confirmEdit}>Salvar</button>
         </div>
       </Modal>
 

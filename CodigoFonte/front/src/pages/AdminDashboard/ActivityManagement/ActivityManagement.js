@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../../../components/Modal/Modal';
+import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService'; // Importa o serviço
 import './ActivityManagement.css';
 
 function ActivityManagement() {
-  // Mock Data
-  const [activities, setActivities] = useState([
-    { id: 1, name: "Musculação Livre", type: "Treino", description: "Treino livre com acompanhamento", duration: "60 min", capacity: "Ilimitado", professional: "João Paulo", time: "08:00 - 22:00", vacancies: "Ilimitado" },
-    { id: 2, name: "Pilates Solo", type: "Aula", description: "Aula de pilates focada em core", duration: "50 min", capacity: "10", professional: "Maria Clara", time: "09:00", vacancies: "3/10" },
-    { id: 3, name: "Crossfit", type: "Aula", description: "Treino de alta intensidade", duration: "60 min", capacity: "20", professional: "Roberto Lima", time: "18:30", vacancies: "20/20" },
-    { id: 4, name: "Zumba", type: "Aula", description: "Dança aeróbica", duration: "45 min", capacity: "20", professional: "Ana Souza", time: "19:00", vacancies: "15/20" }
-  ]);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // --- CARREGAR DADOS ---
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const data = await getAllActivities();
+      setActivities(data);
+    } catch (error) {
+      console.error("Erro ao carregar atividades", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filtros
   const [filterType, setFilterType] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Modais
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  // Filtros
+  // Lógica de Filtro
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
     const searchLower = searchTerm.toLowerCase();
@@ -32,37 +46,42 @@ function ActivityManagement() {
 
   // --- AÇÕES ---
 
+  // 1. Excluir
   const handleDelete = (activity) => {
     setSelectedActivity(activity);
     setDeleteModalOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    await deleteActivityAdmin(selectedActivity.id);
+    
     setActivities(activities.filter(a => a.id !== selectedActivity.id));
     setDeleteModalOpen(false);
     alert("Atividade excluída pelo Administrador.");
   };
 
+  // 2. Editar
   const handleEdit = (activity) => {
     setSelectedActivity({ ...activity });
     setEditModalOpen(true);
   };
 
-  const confirmEdit = (e) => {
+  const confirmEdit = async (e) => {
     e.preventDefault();
-    setActivities(activities.map(a => a.id === selectedActivity.id ? selectedActivity : a));
+    
+    const updated = await updateActivityAdmin(selectedActivity);
+    
+    setActivities(activities.map(a => a.id === updated.id ? updated : a));
     setEditModalOpen(false);
     alert("Atividade atualizada com sucesso!");
   };
 
-  const handleCreate = (e) => {
+  // 3. Criar
+  const handleCreate = async (e) => {
     e.preventDefault();
-    const newActivity = {
-      id: activities.length + 10,
-      ...selectedActivity,
-      time: "A definir", // Como removemos o input, colocamos um valor padrão no mock
-      vacancies: `${selectedActivity.capacity}/${selectedActivity.capacity}`
-    };
+    
+    const newActivity = await createActivityAdmin(selectedActivity);
+    
     setActivities([...activities, newActivity]);
     setCreateModalOpen(false);
     alert("Nova atividade cadastrada!");
@@ -72,6 +91,10 @@ function ActivityManagement() {
     const { name, value } = e.target;
     setSelectedActivity(prev => ({ ...prev, [name]: value }));
   };
+
+  if (loading) {
+    return <div className="admin-activities-container"><p>Carregando gestão de atividades...</p></div>;
+  }
 
   return (
     <div className="admin-activities-container">
@@ -122,7 +145,7 @@ function ActivityManagement() {
         ))}
       </div>
 
-      {/* --- MODAL DE CRIAÇÃO (CORRIGIDO: SEM HORÁRIO) --- */}
+      {/* --- MODAL DE CRIAÇÃO --- */}
       <Modal isOpen={isCreateModalOpen} onClose={() => setCreateModalOpen(false)} title="Cadastrar Nova Atividade">
         <form onSubmit={handleCreate}>
           <div className="modal-form-group">
@@ -164,7 +187,7 @@ function ActivityManagement() {
         </form>
       </Modal>
 
-      {/* --- MODAL DE EDIÇÃO (CORRIGIDO: SEM HORÁRIO E SEM PROFISSIONAL) --- */}
+      {/* --- MODAL DE EDIÇÃO --- */}
       <Modal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} title="Editar Atividade">
         <form onSubmit={confirmEdit}>
           <div className="modal-form-group">
@@ -193,7 +216,7 @@ function ActivityManagement() {
             </div>
           </div>
           
-          {/* REMOVIDOS: Horário e Profissional */}
+          {/* Sem Horário e Sem Profissional na Edição */}
 
           <div className="modal-actions">
             <button type="button" className="btn-cancel-modal" onClick={() => setEditModalOpen(false)}>Cancelar</button>
