@@ -1,34 +1,43 @@
-import React, { useState } from 'react';
-import Modal from '../../../components/Modal/Modal'; // <-- Importe o Modal
+import React, { useState, useEffect } from 'react';
+import Modal from '../../../components/Modal/Modal';
+import { getAvailableActivities, createSchedule } from '../../../services/activityService'; // Importa o serviço
 import './AvailableActivities.css';
 
 function AvailableActivities() {
-  // --- MOCK DATA ---
-  const allActivities = [
-    { id: 101, name: "Musculação Livre", type: "Treino", professional: "João Paulo", time: "08:00 - 22:00", vacancies: "Ilimitado" },
-    { id: 102, name: "Pilates Solo", type: "Aula", professional: "Maria Clara", time: "09:00", vacancies: "3/10" },
-    { id: 103, name: "Boxe Funcional", type: "Aula", professional: "Pedro Rocha", time: "19:00", vacancies: "12/20" },
-    { id: 104, name: "Avaliação Física", type: "Treino", professional: "Dra. Fernanda", time: "Agendável", vacancies: "Livre" },
-    { id: 105, name: "Spinning Intenso", type: "Aula", professional: "Roberto Lima", time: "18:30", vacancies: "0/15" },
-    { id: 106, name: "Yoga Relax", type: "Aula", professional: "Maria Clara", time: "07:00", vacancies: "5/10" }
-  ];
+  const [activities, setActivities] = useState([]); // Dados carregados
+  const [loading, setLoading] = useState(true);
 
-  // Estados
+  // --- CARREGAR DADOS (GET) ---
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getAvailableActivities();
+        setActivities(data);
+      } catch (error) {
+        console.error("Erro ao buscar atividades", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // Estados de Filtro
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
-
+  
   // --- ESTADOS DO MODAL ---
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
-  const [date, setDate] = useState(''); // Para guardar a data escolhida
-  const [time, setTime] = useState('');
+  const [date, setDate] = useState(''); 
+  const [time, setTime] = useState(''); 
 
   // Lógica de Filtragem
-  const filteredActivities = allActivities.filter(activity => {
+  const filteredActivities = activities.filter(activity => {
     const matchesType = filter === 'Todos' || activity.type === filter;
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch =
-      activity.name.toLowerCase().includes(searchLower) ||
+    const matchesSearch = 
+      activity.name.toLowerCase().includes(searchLower) || 
       activity.professional.toLowerCase().includes(searchLower) ||
       activity.time.toLowerCase().includes(searchLower);
     return matchesType && matchesSearch;
@@ -40,26 +49,34 @@ function AvailableActivities() {
     setModalOpen(true);
   };
 
-  const handleConfirmSchedule = (e) => {
+  const handleConfirmSchedule = async (e) => {
     e.preventDefault();
-    // Agora incluímos o horário na confirmação
+    
+    // Chama o serviço para criar o agendamento (Simulação de POST)
+    await createSchedule(selectedActivity.id, date, time);
+
     alert(`Agendamento confirmado para ${selectedActivity.name} no dia ${date} às ${time}!`);
+    
     setModalOpen(false);
     setSelectedActivity(null);
     setDate('');
-    setTime(''); // Limpa o horário também
+    setTime('');
   };
+
+  if (loading) {
+    return <div className="activities-container"><p>Carregando atividades...</p></div>;
+  }
 
   return (
     <div className="activities-container">
       <div className="page-header">
         <h1>Atividades Disponíveis</h1>
-
+        
         <div className="filters-wrapper">
           <div className="search-box">
-            <input
-              type="text"
-              placeholder="Buscar profissional, atividade ou horário..."
+            <input 
+              type="text" 
+              placeholder="Buscar profissional, atividade ou horário..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -90,10 +107,10 @@ function AvailableActivities() {
               </div>
 
               <div className="card-actions">
-                <button
-                  className="btn-schedule"
+                <button 
+                  className="btn-schedule" 
                   disabled={item.vacancies.startsWith("0/")}
-                  onClick={() => handleOpenSchedule(item)} // Abre o Modal
+                  onClick={() => handleOpenSchedule(item)} 
                 >
                   {item.vacancies.startsWith("0/") ? "Lotado" : "Agendar"}
                 </button>
@@ -106,31 +123,30 @@ function AvailableActivities() {
       </div>
 
       {/* --- MODAL DE AGENDAMENTO --- */}
-      <Modal
-        isOpen={isModalOpen}
+      <Modal 
+        isOpen={isModalOpen} 
         onClose={() => setModalOpen(false)}
         title="Confirmar Agendamento"
       >
         <form onSubmit={handleConfirmSchedule}>
           <p>Você está agendando: <strong>{selectedActivity?.name}</strong></p>
           <p className="modal-subtitle">Com {selectedActivity?.professional} às {selectedActivity?.time}</p>
-
+          
           <div className="modal-form-group">
             <label>Escolha a Data:</label>
-            <input
-              type="date"
-              required
+            <input 
+              type="date" 
+              required 
               value={date}
               onChange={(e) => setDate(e.target.value)}
             />
           </div>
 
-          {/* --- NOVO CAMPO DE HORÁRIO --- */}
           <div className="modal-form-group">
             <label>Escolha o Horário:</label>
-            <input
-              type="time"
-              required
+            <input 
+              type="time" 
+              required 
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />

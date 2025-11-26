@@ -1,23 +1,15 @@
 import React, { useState } from 'react';
+import { generateReport } from '../../../services/adminService'; // Importa o serviço
 import './Reports.css';
 
 function Reports() {
-  // --- MOCK DATA (Dados brutos para gerar estatísticas) ---
-  const rawData = [
-    { id: 1, date: "2025-11-20", activity: "Musculação", total: 15, type: "Treino" },
-    { id: 2, date: "2025-11-20", activity: "Pilates Solo", total: 8, type: "Aula" },
-    { id: 3, date: "2025-11-21", activity: "Crossfit", total: 20, type: "Aula" },
-    { id: 4, date: "2025-11-22", activity: "Yoga", total: 10, type: "Aula" },
-    { id: 5, date: "2025-11-23", activity: "Musculação", total: 12, type: "Treino" },
-    { id: 6, date: "2025-11-24", activity: "Boxe", total: 5, type: "Aula" },
-  ];
-
   // Estados
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [reportData, setReportData] = useState(null); // null = nenhum relatório gerado ainda
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleGenerate = (e) => {
+  const handleGenerate = async (e) => {
     e.preventDefault();
     
     if (!startDate || !endDate) {
@@ -25,17 +17,18 @@ function Reports() {
       return;
     }
 
-    // Simula o filtro por data (string comparison funciona para formato yyyy-mm-dd)
-    const filtered = rawData.filter(item => item.date >= startDate && item.date <= endDate);
+    setLoading(true); // Inicia loading
 
-    // Calcula totais
-    const totalStudents = filtered.reduce((acc, curr) => acc + curr.total, 0);
-    const totalActivities = filtered.length;
-
-    setReportData({
-      data: filtered,
-      summary: { totalStudents, totalActivities }
-    });
+    try {
+      // Chama o serviço para processar os dados
+      const data = await generateReport(startDate, endDate);
+      setReportData(data);
+    } catch (error) {
+      console.error("Erro ao gerar relatório", error);
+      alert("Erro ao gerar relatório.");
+    } finally {
+      setLoading(false); // Para loading
+    }
   };
 
   return (
@@ -67,11 +60,13 @@ function Reports() {
             />
           </div>
 
-          <button type="submit" className="btn-generate">Gerar Relatório</button>
+          <button type="submit" className="btn-generate" disabled={loading}>
+            {loading ? "Gerando..." : "Gerar Relatório"}
+          </button>
         </form>
       </div>
 
-      {/* Resultados (Só exibe se tiver gerado) */}
+      {/* Resultados */}
       {reportData && (
         <div className="report-results">
           

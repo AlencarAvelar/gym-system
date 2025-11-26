@@ -1,182 +1,137 @@
-const AtividadeModel = require('../models/atividadeModel');
+const AtividadeService = require('../services/atividadeService');
 
 class AtividadeController {
-  // [RF002] Cadastrar atividade
+  /**
+   * [RF002] Cadastrar atividade
+   */
   static async create(req, res) {
     try {
-      const novaAtividade = await AtividadeModel.create(req.body);
-      
-      return res.status(201).json({
-        success: true,
-        message: 'Atividade cadastrada com sucesso!',
-        data: novaAtividade
-      });
+      const result = await AtividadeService.createAtividade(req.body);
+      return res.status(201).json(result);
     } catch (error) {
-      console.error('Erro ao cadastrar atividade:', error);
+      console.error('Erro no controller ao cadastrar atividade:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao cadastrar atividade',
-        error: error.message
+        message: error.message || 'Erro ao cadastrar atividade'
       });
     }
   }
 
-  // [RF003] Consultar todas as atividades
+  /**
+   * [RF003] Consultar todas as atividades
+   */
   static async getAll(req, res) {
     try {
-      const atividades = await AtividadeModel.findAll();
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Atividades recuperadas com sucesso',
-        data: atividades,
-        total: atividades.length
-      });
+      const result = await AtividadeService.getAllAtividades();
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao consultar atividades:', error);
+      console.error('Erro no controller ao consultar atividades:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao consultar atividades',
-        error: error.message
+        message: error.message || 'Erro ao consultar atividades'
       });
     }
   }
 
-  // Buscar atividade por ID
+  /**
+   * Buscar atividade por ID
+   */
   static async getById(req, res) {
     try {
       const { id } = req.params;
-      const atividade = await AtividadeModel.findById(id);
+      const result = await AtividadeService.getAtividadeById(id);
       
-      if (!atividade) {
-        return res.status(404).json({
-          success: false,
-          message: 'Atividade não encontrada'
-        });
+      if (result.notFound) {
+        return res.status(404).json(result);
       }
       
-      return res.status(200).json({
-        success: true,
-        data: atividade
-      });
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao buscar atividade:', error);
+      console.error('Erro no controller ao buscar atividade:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao buscar atividade',
-        error: error.message
+        message: error.message || 'Erro ao buscar atividade'
       });
     }
   }
 
-  // Buscar atividades por profissional
+  /**
+   * Buscar atividades por profissional
+   */
   static async getByProfissional(req, res) {
     try {
       const { idProfissional } = req.params;
-      const atividades = await AtividadeModel.findByProfissional(idProfissional);
-      
-      return res.status(200).json({
-        success: true,
-        data: atividades,
-        total: atividades.length
-      });
+      const result = await AtividadeService.getAtividadesByProfissional(idProfissional);
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao buscar atividades do profissional:', error);
+      console.error('Erro no controller ao buscar atividades do profissional:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao buscar atividades',
-        error: error.message
+        message: error.message || 'Erro ao buscar atividades'
       });
     }
   }
 
-  // [RF004] Atualizar atividade
+  /**
+   * [RF004] Atualizar atividade
+   */
   static async update(req, res) {
     try {
       const { id } = req.params;
+      const result = await AtividadeService.updateAtividade(id, req.body);
       
-      // Verifica se a atividade existe
-      const atividadeExistente = await AtividadeModel.findById(id);
-      if (!atividadeExistente) {
-        return res.status(404).json({
-          success: false,
-          message: 'Atividade não encontrada'
-        });
+      if (result.notFound) {
+        return res.status(404).json(result);
       }
       
-      const atividadeAtualizada = await AtividadeModel.update(id, req.body);
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Atividade atualizada com sucesso!',
-        data: atividadeAtualizada
-      });
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao atualizar atividade:', error);
+      console.error('Erro no controller ao atualizar atividade:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao atualizar atividade',
-        error: error.message
+        message: error.message || 'Erro ao atualizar atividade'
       });
     }
   }
 
-  // [RF005] Excluir atividade
+  /**
+   * [RF005] Excluir atividade
+   */
   static async delete(req, res) {
     try {
       const { id } = req.params;
+      const result = await AtividadeService.deleteAtividade(id);
       
-      // Verifica se a atividade existe
-      const atividadeExistente = await AtividadeModel.findById(id);
-      if (!atividadeExistente) {
-        return res.status(404).json({
-          success: false,
-          message: 'Atividade não encontrada'
-        });
+      if (result.notFound) {
+        return res.status(404).json(result);
       }
       
-      await AtividadeModel.delete(id);
+      if (result.businessRuleViolation) {
+        return res.status(400).json(result);
+      }
       
-      return res.status(200).json({
-        success: true,
-        message: 'Atividade excluída com sucesso!'
-      });
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao excluir atividade:', error);
-      
-      // Tratamento especial para a regra de negócio
-      if (error.message.includes('agendamentos vinculados')) {
-        return res.status(400).json({
-          success: false,
-          message: error.message
-        });
-      }
-      
+      console.error('Erro no controller ao excluir atividade:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao excluir atividade',
-        error: error.message
+        message: error.message || 'Erro ao excluir atividade'
       });
     }
   }
 
-  // Consultar atividades disponíveis
+  /**
+   * Consultar atividades disponíveis
+   */
   static async getAvailable(req, res) {
     try {
-      const atividades = await AtividadeModel.findAvailable();
-      
-      return res.status(200).json({
-        success: true,
-        message: 'Atividades disponíveis recuperadas com sucesso',
-        data: atividades,
-        total: atividades.length
-      });
+      const result = await AtividadeService.getAvailableAtividades();
+      return res.status(200).json(result);
     } catch (error) {
-      console.error('Erro ao buscar atividades disponíveis:', error);
+      console.error('Erro no controller ao buscar atividades disponíveis:', error);
       return res.status(500).json({
         success: false,
-        message: 'Erro ao buscar atividades disponíveis',
-        error: error.message
+        message: error.message || 'Erro ao buscar atividades disponíveis'
       });
     }
   }
