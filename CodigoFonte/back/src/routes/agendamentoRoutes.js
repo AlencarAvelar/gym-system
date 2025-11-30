@@ -2,28 +2,65 @@ const express = require('express');
 const router = express.Router();
 const AgendamentoController = require('../controllers/agendamentoController');
 const { validateAgendamento, validateAgendamentoUpdate } = require('../middlewares/agendamentoValidation');
-// const { protect, restrictTo } = require('../middlewares/authMiddleware'); // Para implementar depois
+const { protect, restrictTo } = require('../middlewares/authMiddleware'); // ← ADICIONAR
 
-// Rotas para CRUD de Agendamentos
+// ============================================
+// ROTAS PÚBLICAS (para testes sem autenticação)
+// ============================================
 
-// [RF006] Criar novo agendamento (Cliente)
-// router.post('/', protect, restrictTo('Cliente'), validateAgendamento, AgendamentoController.create);
-router.post('/', validateAgendamento, AgendamentoController.create);
+// Criar agendamento público (para testes)
+router.post('/public', validateAgendamento, AgendamentoController.createPublic);
 
-// [RF007] Consultar agendamentos (Cliente, Professor, Personal Trainer)
-// router.get('/', protect, restrictTo('Cliente', 'Professor', 'Personal Trainer'), AgendamentoController.getAll);
-router.get('/', AgendamentoController.getAll);
+// Listar agendamentos públicos (para testes)
+router.get('/public', AgendamentoController.getAllPublic);
 
-// Consultar agendamento por ID
-// router.get('/:id', protect, AgendamentoController.getById);
-router.get('/:id', AgendamentoController.getById);
+// Atualizar agendamento público (para testes)
+router.put('/public/:id', validateAgendamentoUpdate, AgendamentoController.updatePublic);
 
-// [RF008] Atualizar agendamento (Cliente)
-// router.put('/:id', protect, restrictTo('Cliente'), validateAgendamentoUpdate, AgendamentoController.update);
-router.put('/:id', validateAgendamentoUpdate, AgendamentoController.update);
+// Cancelar agendamento público (para testes)
+router.delete('/public/:id', AgendamentoController.cancelPublic);
 
-// [RF009] Cancelar agendamento (Cliente)
-// router.delete('/:id', protect, restrictTo('Cliente'), AgendamentoController.cancel);
-router.delete('/:id', AgendamentoController.cancel);
+// Buscar agendamento por ID público (para testes)
+router.get('/public/:id', AgendamentoController.getById);
+
+// ============================================
+// ROTAS PROTEGIDAS (para produção)
+// ============================================
+
+// [RF006] Criar agendamento (apenas cliente logado)
+router.post('/', 
+  protect, 
+  restrictTo('Cliente'), 
+  validateAgendamento, 
+  AgendamentoController.create
+);
+
+// [RF007] Consultar agendamentos (cliente/profs)
+router.get('/', 
+  protect, 
+  restrictTo('Cliente', 'Professor', 'Personal Trainer'), 
+  AgendamentoController.getAll
+);
+
+// Consultar agendamento por ID (qualquer usuário autenticado)
+router.get('/:id', 
+  protect, 
+  AgendamentoController.getById
+);
+
+// [RF008] Atualizar agendamento (apenas cliente logado)
+router.put('/:id', 
+  protect, 
+  restrictTo('Cliente'), 
+  validateAgendamentoUpdate, 
+  AgendamentoController.update
+);
+
+// [RF009] Cancelar agendamento (apenas cliente logado)
+router.delete('/:id', 
+  protect, 
+  restrictTo('Cliente'), 
+  AgendamentoController.cancel
+);
 
 module.exports = router;
