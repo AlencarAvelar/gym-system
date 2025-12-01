@@ -2,6 +2,7 @@ const UsuarioModel = require('../models/usuarioModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+
 class AuthService {
   /**
    * Autenticar usuário (login)
@@ -18,8 +19,17 @@ class AuthService {
         };
       }
 
-      // Verificar senha
-      const senhaValida = await bcrypt.compare(senha, usuario.senha);
+      // ⚠️ MODO TESTE: Comparação direta sem bcrypt
+      console.log('🔍 DEBUG LOGIN:');
+      console.log('  Email:', email);
+      console.log('  Senha recebida:', senha);
+      console.log('  Senha do banco:', usuario.senha);
+      console.log('  São iguais?', senha === usuario.senha);
+      
+      const senhaValida = (senha === usuario.senha);
+      
+      // MODO PRODUÇÃO (descomente quando voltar ao normal):
+      // const senhaValida = await bcrypt.compare(senha, usuario.senha);
       
       if (!senhaValida) {
         return {
@@ -203,5 +213,6 @@ class AuthService {
     return painel.permissoes.includes(requiredPermission);
   }
 }
+
 
 module.exports = AuthService;

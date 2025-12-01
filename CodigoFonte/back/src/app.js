@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
     message: 'API Gym System rodando!',
     version: '1.0.0',
     endpoints: {
-      auth: '/api/auth/login',
+      auth: '/api/auth',
       atividades: '/api/atividades',
       agendamentos: '/api/agendamentos'
     }
