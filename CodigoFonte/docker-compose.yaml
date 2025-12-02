@@ -1,0 +1,79 @@
+# CodigoFonte/docker-compose.yml
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: gym-system-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gym_user
+      POSTGRES_PASSWORD: gym_password
+      POSTGRES_DB: gym_system
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - gym-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym_user -d gym_system"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend (Node.js + Express)
+  backend:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: gym-system-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: gym_user
+      DB_PASSWORD: gym_password
+      DB_NAME: gym_system
+      JWT_SECRET: seu_jwt_secret_super_seguro_aqui
+      PORT: 3000
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - gym-network
+    volumes:
+      - ./back:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Frontend (React/Vue)
+  frontend:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: gym-system-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - gym-network
+    environment:
+      VITE_API_URL: http://localhost:3000/api
+      # ou REACT_APP_API_URL para Create React App
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  gym-network:
+    driver: bridge
