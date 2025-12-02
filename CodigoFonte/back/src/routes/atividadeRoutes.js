@@ -1,30 +1,48 @@
 const express = require('express');
 const router = express.Router();
 const AtividadeController = require('../controllers/atividadeController');
-const { validateAtividade, validateAtividadeUpdate } = require('../middlewares/validationMiddleware');
-// const { protect, restrictTo } = require('../middlewares/authMiddleware'); // COMENTADO/REMOVIDO
+const { protect, restrictTo } = require('../middlewares/authMiddleware'); // ← ADICIONAR
+const { validateAtividade } = require('../middlewares/atividadeValidation'); // ← SE EXISTIR
 
-// Rotas para CRUD de Atividades
+// Rotas SEM autenticação (para testes públicos - OPCIONAL)
+router.get('/public', AtividadeController.getAllPublic); // ← NOVO (se quiser manter compatibilidade)
+router.get('/public/disponiveis', AtividadeController.getAvailablePublic); // ← NOVO
 
-// [RF002] Cadastrar nova atividade (Sem proteção)
-router.post('/', validateAtividade, AtividadeController.create);
+// Rotas COM autenticação (produção)
+router.get('/', protect, AtividadeController.getAll); // ← PROTEGIDA
+router.get('/disponiveis', protect, AtividadeController.getAvailable); // ← PROTEGIDA
 
-// [RF003] Consultar todas as atividades (Sem proteção)
-router.get('/', AtividadeController.getAll);
+// Cadastrar atividade (Apenas Professor/Personal Trainer/Admin)
+router.post('/', 
+  protect, 
+  restrictTo('Professor', 'Personal Trainer', 'Administrador'), 
+  validateAtividade, 
+  AtividadeController.create
+);
 
-// Consultar atividades disponíveis
-router.get('/disponiveis', AtividadeController.getAvailable);
+// Buscar atividade por ID (qualquer usuário autenticado)
+router.get('/:id', protect, AtividadeController.getById);
 
-// Consultar atividade por ID
-router.get('/:id', AtividadeController.getById);
+// Atualizar atividade (Professor/Personal Trainer/Admin)
+router.put('/:id', 
+  protect, 
+  restrictTo('Professor', 'Personal Trainer', 'Administrador'), 
+  validateAtividade, 
+  AtividadeController.update
+);
 
-// Consultar atividades por profissional
-router.get('/profissional/:idProfissional', AtividadeController.getByProfissional);
+// Buscar atividades por profissional (Professor/Personal Trainer)
+router.get('/profissional/:id', 
+  protect, 
+  restrictTo('Professor', 'Personal Trainer', 'Administrador'), 
+  AtividadeController.getByProfissional
+);
 
-// [RF004] Atualizar atividade (Sem proteção)
-router.put('/:id', validateAtividadeUpdate, AtividadeController.update);
-
-// [RF005] Excluir atividade (Sem proteção)
-router.delete('/:id', AtividadeController.delete);
+// Excluir atividade (Apenas Admin/Professor que criou)
+router.delete('/:id', 
+  protect, 
+  restrictTo('Administrador'), 
+  AtividadeController.delete
+);
 
 module.exports = router;

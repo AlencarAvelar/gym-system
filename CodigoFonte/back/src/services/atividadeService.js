@@ -2,174 +2,137 @@ const AtividadeModel = require('../models/atividadeModel');
 
 class AtividadeService {
   /**
-   * [RF002] Criar nova atividade
-   * Regra de negócio: Validar dados e criar atividade no banco
+   * Listar todas as atividades
    */
-  static async createAtividade(atividadeData) {
+  static async getAll() {
+    try {
+      const atividades = await AtividadeModel.findAll();
+      return atividades;
+    } catch (error) {
+      console.error('Erro no service ao listar atividades:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Listar atividades disponíveis para clientes (com vagas)
+   */
+  static async getAvailableForClient() {
+    try {
+      const atividades = await AtividadeModel.findAvailable();
+      return atividades;
+    } catch (error) {
+      console.error('Erro no service ao listar atividades disponíveis:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Criar atividade
+   */
+  static async create(atividadeData) {
     try {
       const novaAtividade = await AtividadeModel.create(atividadeData);
       return {
         success: true,
-        message: 'Atividade cadastrada com sucesso!',
+        message: 'Atividade criada com sucesso',
         data: novaAtividade
       };
     } catch (error) {
       console.error('Erro no service ao criar atividade:', error);
-      throw new Error('Falha ao cadastrar atividade');
+      
+      if (error.code === '23503') { // Foreign key violation
+        return {
+          success: false,
+          message: 'Profissional não encontrado'
+        };
+      }
+      
+      throw error;
     }
   }
 
   /**
-   * [RF003] Listar todas as atividades
+   * Buscar por ID
    */
-  static async getAllAtividades() {
-    try {
-      const atividades = await AtividadeModel.findAll();
-      return {
-        success: true,
-        message: 'Atividades recuperadas com sucesso',
-        data: atividades,
-        total: atividades.length
-      };
-    } catch (error) {
-      console.error('Erro no service ao listar atividades:', error);
-      throw new Error('Falha ao recuperar atividades');
-    }
-  }
-
-  /**
-   * Buscar atividade por ID
-   * Regra de negócio: Verificar se atividade existe
-   */
-  static async getAtividadeById(id) {
+  static async getById(id) {
     try {
       const atividade = await AtividadeModel.findById(id);
-      
-      if (!atividade) {
-        return {
-          success: false,
-          message: 'Atividade não encontrada',
-          notFound: true
-        };
-      }
-
-      return {
-        success: true,
-        data: atividade
-      };
+      return atividade;
     } catch (error) {
-      console.error('Erro no service ao buscar atividade por ID:', error);
-      throw new Error('Falha ao buscar atividade');
+      console.error('Erro no service ao buscar atividade:', error);
+      throw error;
     }
   }
 
   /**
-   * Buscar atividades por profissional
+   * Atualizar atividade
    */
-  static async getAtividadesByProfissional(idProfissional) {
+  static async update(id, atividadeData) {
     try {
-      const atividades = await AtividadeModel.findByProfissional(idProfissional);
-      
-      return {
-        success: true,
-        data: atividades,
-        total: atividades.length
-      };
-    } catch (error) {
-      console.error('Erro no service ao buscar atividades por profissional:', error);
-      throw new Error('Falha ao buscar atividades do profissional');
-    }
-  }
-
-  /**
-   * [RF004] Atualizar atividade
-   * Regra de negócio: Verificar existência antes de atualizar
-   */
-  static async updateAtividade(id, atividadeData) {
-    try {
-      // Verifica se a atividade existe
-      const atividadeExistente = await AtividadeModel.findById(id);
-      
-      if (!atividadeExistente) {
-        return {
-          success: false,
-          message: 'Atividade não encontrada',
-          notFound: true
-        };
-      }
-
-      // Atualiza a atividade
       const atividadeAtualizada = await AtividadeModel.update(id, atividadeData);
       
+      if (!atividadeAtualizada) {
+        return {
+          success: false,
+          message: 'Atividade não encontrada'
+        };
+      }
+
       return {
         success: true,
-        message: 'Atividade atualizada com sucesso!',
+        message: 'Atividade atualizada com sucesso',
         data: atividadeAtualizada
       };
     } catch (error) {
       console.error('Erro no service ao atualizar atividade:', error);
-      throw new Error('Falha ao atualizar atividade');
+      throw error;
     }
   }
 
   /**
-   * [RF005] Excluir atividade
-   * Regra de negócio: 
-   * - Verificar se existe
-   * - Não pode excluir se tiver agendamentos ativos vinculados
+   * Buscar por profissional
    */
-  static async deleteAtividade(id) {
+  static async getByProfissional(idProfissional) {
     try {
-      // Verifica se a atividade existe
-      const atividadeExistente = await AtividadeModel.findById(id);
-      
-      if (!atividadeExistente) {
-        return {
-          success: false,
-          message: 'Atividade não encontrada',
-          notFound: true
-        };
-      }
-
-      // Tenta excluir (model valida agendamentos)
-      await AtividadeModel.delete(id);
-      
-      return {
-        success: true,
-        message: 'Atividade excluída com sucesso!'
-      };
+      const atividades = await AtividadeModel.findByProfissional(idProfissional);
+      return atividades;
     } catch (error) {
-      console.error('Erro no service ao excluir atividade:', error);
-      
-      // Tratamento de regra de negócio específica
-      if (error.message.includes('agendamentos vinculados')) {
-        return {
-          success: false,
-          message: error.message,
-          businessRuleViolation: true
-        };
-      }
-      
-      throw new Error('Falha ao excluir atividade');
+      console.error('Erro no service ao buscar atividades por profissional:', error);
+      throw error;
     }
   }
 
   /**
-   * Buscar atividades disponíveis (com vagas)
+   * Deletar atividade
    */
-  static async getAvailableAtividades() {
+  static async delete(id) {
     try {
-      const atividades = await AtividadeModel.findAvailable();
+      const resultado = await AtividadeModel.delete(id);
       
+      if (resultado.rowCount === 0) {
+        return {
+          success: false,
+          message: 'Atividade não encontrada ou já foi excluída'
+        };
+      }
+
       return {
         success: true,
-        message: 'Atividades disponíveis recuperadas com sucesso',
-        data: atividades,
-        total: atividades.length
+        message: 'Atividade excluída com sucesso'
       };
     } catch (error) {
-      console.error('Erro no service ao buscar atividades disponíveis:', error);
-      throw new Error('Falha ao buscar atividades disponíveis');
+      console.error('Erro no service ao deletar atividade:', error);
+      
+      // Se há agendamentos ativos, não pode deletar
+      if (error.code === '23503') {
+        return {
+          success: false,
+          message: 'Não é possível excluir atividade com agendamentos ativos'
+        };
+      }
+      
+      throw error;
     }
   }
 }
