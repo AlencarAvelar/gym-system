@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../../components/Modal/Modal';
-import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService'; // Importa o serviço
+import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService';
 import './ActivityManagement.css';
 
 function ActivityManagement() {
@@ -23,30 +23,30 @@ function ActivityManagement() {
     }
   };
 
-  // Filtros
   const [filterType, setFilterType] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Modais
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  // Lógica de Filtro
+  // --- FILTRO BLINDADO ---
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
+    
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      item.name.toLowerCase().includes(searchLower) || 
-      item.professional.toLowerCase().includes(searchLower);
+    const nameSafe = (item.name || '').toLowerCase();
+    const profSafe = (item.professional || '').toLowerCase();
+
+    const matchesSearch = nameSafe.includes(searchLower) || profSafe.includes(searchLower);
+    
     return matchesType && matchesSearch;
   });
 
   // --- AÇÕES ---
 
-  // 1. Excluir
   const handleDelete = (activity) => {
     setSelectedActivity(activity);
     setDeleteModalOpen(true);
@@ -54,13 +54,11 @@ function ActivityManagement() {
 
   const confirmDelete = async () => {
     await deleteActivityAdmin(selectedActivity.id);
-    
     setActivities(activities.filter(a => a.id !== selectedActivity.id));
     setDeleteModalOpen(false);
     alert("Atividade excluída pelo Administrador.");
   };
 
-  // 2. Editar
   const handleEdit = (activity) => {
     setSelectedActivity({ ...activity });
     setEditModalOpen(true);
@@ -68,23 +66,43 @@ function ActivityManagement() {
 
   const confirmEdit = async (e) => {
     e.preventDefault();
-    
     const updated = await updateActivityAdmin(selectedActivity);
     
-    setActivities(activities.map(a => a.id === updated.id ? updated : a));
+    const updatedVisual = {
+        ...selectedActivity,
+        ...updated 
+    };
+
+    setActivities(activities.map(a => a.id === selectedActivity.id ? updatedVisual : a));
     setEditModalOpen(false);
     alert("Atividade atualizada com sucesso!");
   };
 
-  // 3. Criar
+  // --- CRIAÇÃO DE ATIVIDADE ---
   const handleCreate = async (e) => {
     e.preventDefault();
     
-    const newActivity = await createActivityAdmin(selectedActivity);
-    
-    setActivities([...activities, newActivity]);
-    setCreateModalOpen(false);
-    alert("Nova atividade cadastrada!");
+    try {
+      const rawCreated = await createActivityAdmin(selectedActivity);
+      
+      const newVisualActivity = {
+        id: rawCreated.id_atividade,
+        name: rawCreated.nome_atividade,
+        type: rawCreated.tipo_atividade,
+        description: rawCreated.descricao,
+        duration: `${rawCreated.duracao} min`,
+        capacity: rawCreated.capacidade_max,
+        professional: `Instrutor (ID: ${rawCreated.id_profissional})`, 
+        time: "A definir",
+        vacancies: `${rawCreated.capacidade_max}/${rawCreated.capacidade_max}`
+      };
+
+      setActivities([...activities, newVisualActivity]);
+      setCreateModalOpen(false);
+      alert("Nova atividade cadastrada com sucesso!");
+    } catch (error) {
+      // O erro já foi tratado com alert no Service
+    }
   };
 
   const handleChange = (e) => {
@@ -166,18 +184,26 @@ function ActivityManagement() {
           </div>
           <div className="modal-row">
             <div className="modal-form-group">
-              <label>Duração:</label>
-              <input type="text" name="duration" placeholder="Ex: 60 min" required onChange={handleChange} />
+              <label>Duração (min):</label>
+              <input type="number" name="duration" placeholder="Ex: 60" required onChange={handleChange} />
             </div>
             <div className="modal-form-group">
-              <label>Capacidade Máxima:</label>
+              <label>Capacidade:</label>
               <input type="number" name="capacity" required onChange={handleChange} />
             </div>
           </div>
-          {/* Campo de Profissional (Apenas para Admin) */}
+          
+          {/* MUDANÇA: Campo manual para testar IDs */}
           <div className="modal-form-group">
-            <label>Profissional Responsável:</label>
-            <input type="text" name="professional" required onChange={handleChange} />
+            <label>ID do Profissional (Número):</label>
+            <input 
+              type="number" 
+              name="professional" 
+              placeholder="Ex: 1, 2, 3..." 
+              required 
+              onChange={handleChange} 
+            />
+            <small style={{color: '#666', fontSize: '0.8rem'}}>Verifique no banco qual ID é de um professor.</small>
           </div>
 
           <div className="modal-actions">
@@ -215,8 +241,6 @@ function ActivityManagement() {
               <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
           </div>
-          
-          {/* Sem Horário e Sem Profissional na Edição */}
 
           <div className="modal-actions">
             <button type="button" className="btn-cancel-modal" onClick={() => setEditModalOpen(false)}>Cancelar</button>
