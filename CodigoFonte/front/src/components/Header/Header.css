@@ -36,6 +36,7 @@
 .main-nav {
   display: flex;
   gap: 1.5rem;
+  align-items: center;
 }
 
 .main-nav a {

@@ -1,108 +1,202 @@
-// src/services/adminService.js
+import api from './api';
 
-// --- MOCK DATA (Todas as atividades da academia) ---
-let MOCK_ALL_ACTIVITIES = [
-  { id: 1, name: "Musculação Livre", type: "Treino", description: "Treino livre com acompanhamento", duration: "60 min", capacity: "Ilimitado", professional: "João Paulo", time: "08:00 - 22:00", vacancies: "Ilimitado" },
-  { id: 2, name: "Pilates Solo", type: "Aula", description: "Aula de pilates focada em core", duration: "50 min", capacity: "10", professional: "Maria Clara", time: "09:00", vacancies: "3/10" },
-  { id: 3, name: "Crossfit", type: "Aula", description: "Treino de alta intensidade", duration: "60 min", capacity: "20", professional: "Roberto Lima", time: "18:30", vacancies: "20/20" },
-  { id: 4, name: "Zumba", type: "Aula", description: "Dança aeróbica", duration: "45 min", capacity: "20", professional: "Ana Souza", time: "19:00", vacancies: "15/20" }
-];
+// ==========================================
+// SEÇÃO 1: GERENCIAMENTO DE ATIVIDADES
+// ==========================================
 
-// GET: Buscar todas as atividades
+// GET: Buscar TODAS as atividades
 export const getAllActivities = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...MOCK_ALL_ACTIVITIES]);
-    }, 300);
-  });
+  try {
+    const response = await api.get('/atividades');
+
+    const listaAtividades = Array.isArray(response.data) ? response.data : response.data.data || [];
+
+    return listaAtividades.map(item => {
+      const total = item.capacidade_max || 0;
+      const disponiveis = item.vagas_disponiveis !== undefined ? item.vagas_disponiveis : total;
+      const ocupadas = total - disponiveis;
+
+      return {
+        id: item.id_atividade,
+        name: item.nome_atividade,
+        type: item.tipo_atividade,
+        description: item.descricao,
+
+        // Mantemos 'duration' para o formulário de edição funcionar
+        duration: item.duracao ? `${item.duracao} min` : '0 min',
+
+        capacity: total,
+        professional: item.nome_profissional || `Instrutor (ID: ${item.id_profissional})`,
+
+        // --- CORREÇÃO DO BUG VISUAL ---
+        // Antes estava fixo "A definir". Agora mostra a duração (ex: "60 min").
+        time: item.duracao ? `${item.duracao} min` : "A definir",
+
+        vacancies: `${ocupadas}/${total}`
+      };
+    });
+  } catch (error) {
+    console.error("Erro ao buscar atividades:", error);
+    return [];
+  }
 };
 
-// DELETE: Excluir atividade (Admin tem poder total)
+// POST: Criar nova atividade
+export const createActivityAdmin = async (newActivity) => {
+  try {
+    const payload = {
+      nome_atividade: newActivity.name,
+      tipo_atividade: newActivity.type,
+      descricao: newActivity.description,
+      duracao: parseInt(newActivity.duration),
+      capacidade_max: parseInt(newActivity.capacity),
+      // Usa o ID digitado ou fallback para 1
+      id_profissional: newActivity.professional ? parseInt(newActivity.professional) : 1
+    };
+
+    const response = await api.post('/atividades', payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar atividade:", error);
+    const serverMessage = error.response?.data?.message || "Erro desconhecido";
+    // Tenta ler erros de validação array
+    const errors = error.response?.data?.errors ? "\n" + error.response.data.errors.join("\n") : "";
+    alert(`Erro ao Criar: ${serverMessage}${errors}`);
+    throw error;
+  }
+};
+
+// DELETE: Excluir atividade
 export const deleteActivityAdmin = async (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      MOCK_ALL_ACTIVITIES = MOCK_ALL_ACTIVITIES.filter(a => a.id !== id);
-      resolve(true);
-    }, 300);
-  });
+  try {
+    await api.delete(`/atividades/${id}`);
+    return true;
+  } catch (error) {
+    console.error("Erro ao excluir:", error);
+    const serverMessage = error.response?.data?.message || "Erro de permissão.";
+    alert(`Erro ao Excluir: ${serverMessage}`);
+    throw error;
+  }
 };
 
 // PUT: Editar atividade
 export const updateActivityAdmin = async (updatedActivity) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      MOCK_ALL_ACTIVITIES = MOCK_ALL_ACTIVITIES.map(a => 
-        a.id === updatedActivity.id ? updatedActivity : a
-      );
-      resolve(updatedActivity);
-    }, 300);
-  });
+  try {
+    const payload = {
+      nome_atividade: updatedActivity.name,
+      tipo_atividade: updatedActivity.type,
+      descricao: updatedActivity.description,
+      // Limpa string "min" e garante int
+      duracao: parseInt(updatedActivity.duration.toString().replace(/\D/g, '')),
+      capacidade_max: parseInt(updatedActivity.capacity),
+
+      // AGORA MANDAMOS O ID ATUALIZADO
+      id_profissional: parseInt(updatedActivity.professionalId)
+    };
+
+    console.log("Enviando Update:", payload); // Debug
+
+    const response = await api.put(`/atividades/${updatedActivity.id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar:", error);
+    const serverMessage = error.response?.data?.message || "Erro de validação";
+    alert(`Erro ao Editar: ${serverMessage}`);
+    throw error;
+  }
 };
 
-// POST: Criar nova atividade (Admin define o profissional)
-export const createActivityAdmin = async (newActivity) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const created = { 
-        ...newActivity, 
-        id: Math.floor(Math.random() * 10000), // ID aleatório
-        vacancies: `${newActivity.capacity}/${newActivity.capacity}`, // Inicializa vagas
-        time: "A definir" // Valor padrão já que removemos o input de horário
-      };
-      MOCK_ALL_ACTIVITIES.push(created);
-      resolve(created);
-    }, 300);
-  });
-};
+// ==========================================
+// SEÇÃO 2: GERENCIAMENTO DE AGENDAMENTOS
+// ==========================================
 
-// ... (Código anterior das Atividades) ...
-
-// --- MOCK DATA (Todos os agendamentos do sistema) ---
-const MOCK_ALL_APPOINTMENTS = [
-  { id: 1, date: "2025-11-20", time: "08:00", activity: "Musculação", client: "Ana Beatriz", professional: "João Paulo", status: "Confirmado" },
-  { id: 2, date: "2025-11-20", time: "09:00", activity: "Pilates Solo", client: "Carlos Eduardo", professional: "Maria Clara", status: "Confirmado" },
-  { id: 3, date: "2025-11-20", time: "14:00", activity: "Avaliação Física", client: "Roberto Justus", professional: "Dra. Fernanda", status: "Pendente" },
-  { id: 4, date: "2025-11-21", time: "18:30", activity: "Crossfit", client: "Julia Roberts", professional: "Roberto Lima", status: "Cancelado" },
-  { id: 5, date: "2025-11-22", time: "10:00", activity: "Yoga", client: "Michael Scott", professional: "Maria Clara", status: "Confirmado" },
-];
-
-// GET: Buscar todos os agendamentos
 export const getAllAppointments = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...MOCK_ALL_APPOINTMENTS]);
-    }, 300);
-  });
+  try {
+    const response = await api.get('/agendamentos');
+    const listaAgendamentos = Array.isArray(response.data) ? response.data : response.data.data || [];
+
+    return listaAgendamentos.map(item => {
+      const rawDate = item.data_agendada ? item.data_agendada.split('T')[0] : '';
+      return {
+        id: item.id_agendamento,
+        activity: item.nome_atividade || item.atividade?.nome_atividade || "Atividade",
+        type: item.tipo_atividade || item.atividade?.tipo_atividade || "Treino",
+        client: item.nome_cliente || item.usuario?.nome || "Aluno",
+        professional: item.nome_profissional || item.profissional?.nome || "Instrutor",
+        date: rawDate,
+        time: item.horario_agendado?.slice(0, 5),
+        status: item.status || "Ativo"
+      };
+    });
+  } catch (error) {
+    console.error("Erro ao buscar todos agendamentos:", error);
+    return [];
+  }
 };
 
-// ... (Código anterior de Atividades e Agendamentos) ...
+// ==========================================
+// SEÇÃO 3: RELATÓRIOS
+// ==========================================
 
-// --- MOCK DATA (Dados brutos para Relatórios) ---
-const MOCK_REPORT_DATA = [
-  { id: 1, date: "2025-11-20", activity: "Musculação", total: 15, type: "Treino" },
-  { id: 2, date: "2025-11-20", activity: "Pilates Solo", total: 8, type: "Aula" },
-  { id: 3, date: "2025-11-21", activity: "Crossfit", total: 20, type: "Aula" },
-  { id: 4, date: "2025-11-22", activity: "Yoga", total: 10, type: "Aula" },
-  { id: 5, date: "2025-11-23", activity: "Musculação", total: 12, type: "Treino" },
-  { id: 6, date: "2025-11-24", activity: "Boxe", total: 5, type: "Aula" },
-];
-
-// POST/GET: Gerar Relatório (Simula o processamento no servidor)
+// RELATÓRIOS (Calculado no Front-End com dados reais)
 export const generateReport = async (startDate, endDate) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Filtra por data
-      const filtered = MOCK_REPORT_DATA.filter(item => item.date >= startDate && item.date <= endDate);
+  try {
+    // 1. Busca TODOS os agendamentos do sistema
+    const allAppointments = await getAllAppointments();
 
-      // Calcula totais (O back-end faria isso)
-      const totalStudents = filtered.reduce((acc, curr) => acc + curr.total, 0);
-      const totalActivities = filtered.length;
+    // 2. Filtra pelo período selecionado
+    // Convertemos as datas para objetos Date para comparar corretamente
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-      // Retorna o objeto pronto
-      resolve({
-        data: filtered,
-        summary: { totalStudents, totalActivities }
-      });
-    }, 500); // Simula delay de cálculo
-  });
-};
+    // Ajuste: definir hora para garantir comparação inclusiva
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    const filtered = allAppointments.filter(item => {
+      const itemDate = new Date(item.date);
+      // Filtra apenas os que não foram cancelados e estão na data
+      return item.status !== 'Cancelado' && itemDate >= start && itemDate <= end;
+    });
+
+    // 3. Agrupa por Atividade para mostrar na tabela (Opcional, ou mostra lista plana)
+    // Aqui vamos retornar a lista filtrada para exibir na tabela detalhada
+
+    // Calcula totais
+    const totalStudents = filtered.length; // Cada agendamento é um aluno inscrito
+
+    // Conta quantas atividades únicas tiveram aula nesse período
+    const uniqueActivities = new Set(filtered.map(item => item.activity)).size;
+
+    // Formata para o padrão que a tela espera
+    // A tela espera: { date, activity, type, total (inscritos na sessão) }
+    // Como nossa lista é por ALUNO, precisamos agrupar.
+
+    const groupedMap = {};
+
+    filtered.forEach(item => {
+      const key = `${item.date}-${item.activity}-${item.time}`; // Chave única por sessão
+      if (!groupedMap[key]) {
+        groupedMap[key] = {
+          id: Math.random(),
+          date: item.date,
+          activity: item.activity,
+          type: item.type,
+          total: 0
+        };
+      }
+      groupedMap[key].total += 1;
+    });
+
+    const reportItems = Object.values(groupedMap).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    return {
+      data: reportItems,
+      summary: { totalStudents, totalActivities: uniqueActivities }
+    };
+
+  } catch (error) {
+    console.error("Erro ao gerar relatório:", error);
+    return { data: [], summary: { totalStudents: 0, totalActivities: 0 } };
+  }
+};  

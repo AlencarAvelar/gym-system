@@ -1,40 +1,75 @@
-// src/services/appointmentService.js
+import api from './api';
+import { getAvailableActivities } from './activityService'; // Importamos para pegar as vagas
 
-// --- DADOS MOCKADOS (Aqui simulam o Banco de Dados) ---
-let MOCK_APPOINTMENTS = [
-  { id: 1, activity: "Musculação", type: "Treino", professional: "Carlos Silva", date: "20/11/2025", time: "14:00", vacancies: "15/30" },
-  { id: 2, activity: "Yoga Matinal", type: "Aula", professional: "Ana Souza", date: "21/11/2025", time: "08:00", vacancies: "8/10" },
-  { id: 3, activity: "Crossfit", type: "Aula", professional: "Roberto Lima", date: "22/11/2025", time: "18:30", vacancies: "20/20" }
-];
-
-// Função para BUSCAR dados (GET)
+// GET: Buscar MEUS agendamentos
 export const getMyAppointments = async () => {
-  // Simulamos um delay de rede de 300ms
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...MOCK_APPOINTMENTS]); // Retorna uma cópia
-    }, 300);
-  });
+  try {
+    // 1. Busca os agendamentos do usuário
+    const responseAppointments = await api.get('/agendamentos');
+    const listaAgendamentos = responseAppointments.data.data || [];
+
+    // 2. Busca todas as atividades disponíveis (que contém a info de vagas atualizada)
+    const atividadesDetalhadas = await getAvailableActivities();
+
+    const dataAdapted = listaAgendamentos.map(item => {
+      const rawDate = item.data_agendada ? item.data_agendada.split('T')[0] : '';
+      const rawTime = item.horario_agendado ? item.horario_agendado.slice(0, 5) : '';
+
+      // Tenta encontrar a atividade correspondente para pegar as vagas reais
+      const atividadeInfo = atividadesDetalhadas.find(atv => atv.id === item.id_atividade);
+      
+      // Se achou, usa as vagas dela. Se não, usa um fallback.
+      const vagasReais = atividadeInfo ? atividadeInfo.vacancies : "-";
+
+      return {
+        id: item.id_agendamento,
+        // Garante que mostramos o nome, seja do join do agendamento ou da busca cruzada
+        activity: item.nome_atividade || (atividadeInfo ? atividadeInfo.name : "Atividade"), 
+        type: item.tipo_atividade || (atividadeInfo ? atividadeInfo.type : "Treino"), 
+        professional: item.nome_profissional || "Instrutor",
+        date: rawDate, 
+        time: rawTime,
+        vacancies: vagasReais, // <--- AQUI ESTÁ A CORREÇÃO VISUAL
+        status: item.status 
+      };
+    });
+
+    // Filtra para não mostrar os cancelados na lista principal
+    return dataAdapted.filter(item => item.status !== 'Cancelado');
+
+  } catch (error) {
+    console.error("Erro ao buscar agendamentos:", error);
+    return [];
+  }
 };
 
-// Função para DELETAR dados (DELETE)
+// DELETE: Cancelar agendamento
 export const deleteAppointment = async (id) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      MOCK_APPOINTMENTS = MOCK_APPOINTMENTS.filter(a => a.id !== id);
-      resolve(true); // Retorna sucesso
-    }, 300);
-  });
+  try {
+    await api.delete(`/agendamentos/${id}`);
+    return true;
+  } catch (error) {
+    console.error("Erro ao excluir agendamento:", error);
+    const msg = error.response?.data?.message || "Erro ao cancelar.";
+    alert(msg); 
+    throw error;
+  }
 };
 
-// Função para ATUALIZAR dados (PUT)
-export const updateAppointment = async (updatedAppointment) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      MOCK_APPOINTMENTS = MOCK_APPOINTMENTS.map(a => 
-        a.id === updatedAppointment.id ? updatedAppointment : a
-      );
-      resolve(updatedAppointment);
-    }, 300);
-  });
+// PUT: Atualizar agendamento (Remarcar)
+export const updateAppointment = async (updatedItem) => {
+  try {
+    const payload = {
+      data_agendada: updatedItem.date,
+      horario_agendado: updatedItem.time
+    };
+    
+    const response = await api.put(`/agendamentos/${updatedItem.id}`, payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar agendamento:", error);
+    const msg = error.response?.data?.message || "Erro ao remarcar.";
+    alert(msg);
+    throw error;
+  }
 };

@@ -1,17 +1,27 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { authService } from '../services/authService'; // <-- 1. Importamos o serviço
 import './DashboardLayout.css';
 
 function DashboardLayout() {
   const location = useLocation();
   
+  // 2. Pegamos os dados do usuário logado (que tem o 'nome')
+  const user = authService.getCurrentUser();
+
   const isProfessional = location.pathname.includes('/profissional');
-  const isAdmin = location.pathname.includes('/admin'); // <-- NOVO
+  const isAdmin = location.pathname.includes('/admin');
 
   // Define o título da área com base na rota
   let areaTitle = "Área do Cliente";
   if (isProfessional) areaTitle = "Área do Profissional";
   if (isAdmin) areaTitle = "Área Administrativa";
+
+  // Função para fazer logout real
+  const handleLogout = (e) => {
+    e.preventDefault();
+    authService.logout(); // Limpa o token e redireciona
+  };
 
   return (
     <div className="dashboard-container">
@@ -41,7 +51,7 @@ function DashboardLayout() {
             </>
           )}
 
-          {/* --- MENU DO CLIENTE (Se não for nem Admin nem Pro) --- */}
+          {/* --- MENU DO CLIENTE --- */}
           {!isAdmin && !isProfessional && (
             <>
               <Link to="/dashboard" className="nav-item">Meus Agendamentos</Link>
@@ -50,10 +60,13 @@ function DashboardLayout() {
           )}
           
           <div className="user-info">
+            {/* 3. Exibe o nome real do usuário (ou 'Visitante' se der erro) */}
             <span className="user-name">
-              {isAdmin ? "Olá, Administrador" : (isProfessional ? "Olá, Professor" : "Olá, Cliente")}
+              Olá, {user ? user.nome : 'Visitante'}
             </span>
-            <Link to="/" className="logout-btn">Sair</Link>
+            
+            {/* 4. Botão de Sair com ação real */}
+            <a href="/" onClick={handleLogout} className="logout-btn">Sair</a>
           </div>
         </nav>
       </header>

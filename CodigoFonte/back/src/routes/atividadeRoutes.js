@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AtividadeController = require('../controllers/atividadeController');
 const { protect, restrictTo } = require('../middlewares/authMiddleware'); // ← ADICIONAR
-const { validateAtividade } = require('../middlewares/atividadeValidation'); // ← SE EXISTIR
+const { validateAtividade, validateAtividadeUpdate } = require('../middlewares/atividadeValidation'); // ← SE EXISTIR
 
 // Rotas SEM autenticação (para testes públicos - OPCIONAL)
 router.get('/public', AtividadeController.getAllPublic); // ← NOVO (se quiser manter compatibilidade)
@@ -27,7 +27,7 @@ router.get('/:id', protect, AtividadeController.getById);
 router.put('/:id', 
   protect, 
   restrictTo('Professor', 'Personal Trainer', 'Administrador'), 
-  validateAtividade, 
+  validateAtividadeUpdate, 
   AtividadeController.update
 );
 
@@ -41,7 +41,7 @@ router.get('/profissional/:id',
 // Excluir atividade (Apenas Admin/Professor que criou)
 router.delete('/:id', 
   protect, 
-  restrictTo('Administrador'), 
+  restrictTo('Professor', 'Personal Trainer', 'Administrador'), 
   AtividadeController.delete
 );
 

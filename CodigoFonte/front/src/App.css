@@ -62,3 +62,33 @@ body {
 #sobre-section {
   scroll-margin-top: 6rem; /* Use o mesmo valor do passo 1 */
 }
+
+/* --- Estilo do Novo Texto (Sobre) --- */
+.landing-subtitle {
+  font-size: 1.15rem;
+  color: #d0d0d0;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+  max-width: 800px; /* Largura boa para leitura */
+  font-weight: 300;
+  
+  /* Barra lateral azul */
+  border-left: 4px solid #007bff;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.landing-subtitle strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Ajuste para celular */
+@media (max-width: 768px) {
+  .landing-subtitle {
+    font-size: 1rem;
+    text-align: left; /* Mantém alinhado à esquerda para ficar bonito com a barra */
+    border-left: 3px solid #007bff;
+    padding-left: 15px;
+  }
+}

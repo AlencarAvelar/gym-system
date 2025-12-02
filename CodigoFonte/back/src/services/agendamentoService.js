@@ -13,8 +13,8 @@ class AgendamentoService {
 
       // Verifica conflito de horário
       const temConflito = await AgendamentoModel.checkConflito(
-        id_cliente, 
-        data_agendada, 
+        id_cliente,
+        data_agendada,
         horario_agendado
       );
 
@@ -28,8 +28,8 @@ class AgendamentoService {
 
       // Verifica disponibilidade de vagas
       const temVaga = await AgendamentoModel.checkDisponibilidade(
-        id_atividade, 
-        data_agendada, 
+        id_atividade,
+        data_agendada,
         horario_agendado
       );
 
@@ -61,24 +61,35 @@ class AgendamentoService {
    * - Cliente vê apenas seus agendamentos
    * - Profissional vê agendamentos das atividades que ministra
    */
+  /**
+     * [RF007] Consultar agendamentos
+     */
   static async getAgendamentos(userId, userType) {
     try {
       let agendamentos;
+
+      console.log(`🔍 DEBUG Service: Buscando para tipo '${userType}'`);
 
       if (userType === 'Cliente') {
         agendamentos = await AgendamentoModel.findByCliente(userId);
       } else if (userType === 'Professor' || userType === 'Personal Trainer') {
         agendamentos = await AgendamentoModel.findByProfissional(userId);
+      } else if (userType === 'Administrador') {
+        console.log("   ✅ Entrou no bloco Administrador");
+        agendamentos = await AgendamentoModel.findAll();
       } else {
+        console.log("   ❌ Tipo inválido detectado");
         return {
           success: false,
           message: 'Tipo de usuário inválido para esta operação'
         };
       }
 
+      console.log(`   📦 Registros encontrados no Banco: ${agendamentos.length}`);
+
       if (agendamentos.length === 0) {
         return {
-          success: true,
+          success: true, // Retorna sucesso mesmo vazio, para não dar erro 400 no front
           message: 'Nenhum agendamento encontrado!',
           data: [],
           total: 0
