@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../../components/Modal/Modal';
-import { getAvailableActivities, createSchedule } from '../../../services/activityService'; // Importa o serviço
+import { getAvailableActivities, createSchedule } from '../../../services/activityService';
 import './AvailableActivities.css';
 
 function AvailableActivities() {
-  const [activities, setActivities] = useState([]); // Dados carregados
+  const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // --- CARREGAR DADOS (GET) ---
@@ -39,6 +39,7 @@ function AvailableActivities() {
     const matchesSearch = 
       activity.name.toLowerCase().includes(searchLower) || 
       activity.professional.toLowerCase().includes(searchLower) ||
+      // Agora buscamos pela string formatada de tempo/duração também
       activity.time.toLowerCase().includes(searchLower);
     return matchesType && matchesSearch;
   });
@@ -52,7 +53,7 @@ function AvailableActivities() {
   const handleConfirmSchedule = async (e) => {
     e.preventDefault();
     
-    // Chama o serviço para criar o agendamento (Simulação de POST)
+    // Chama o serviço para criar o agendamento
     await createSchedule(selectedActivity.id, date, time);
 
     alert(`Agendamento confirmado para ${selectedActivity.name} no dia ${date} às ${time}!`);
@@ -103,16 +104,21 @@ function AvailableActivities() {
               <div className="card-body">
                 <h3>{item.name}</h3>
                 <p className="professional">Profissional: {item.professional}</p>
-                <div className="time-badge">🕒 {item.time}</div>
+                
+                {/* --- CORREÇÃO: Mostra Duração com Ícone --- */}
+                <div className="time-badge">
+                  ⏳ Duração: {item.time}
+                </div>
               </div>
 
               <div className="card-actions">
+                {/* --- CORREÇÃO: Usa a flag isFull para bloquear --- */}
                 <button 
                   className="btn-schedule" 
-                  disabled={item.vacancies.startsWith("0/")}
+                  disabled={item.isFull}
                   onClick={() => handleOpenSchedule(item)} 
                 >
-                  {item.vacancies.startsWith("0/") ? "Lotado" : "Agendar"}
+                  {item.isFull ? "Lotado" : "Agendar"}
                 </button>
               </div>
             </div>
@@ -130,7 +136,8 @@ function AvailableActivities() {
       >
         <form onSubmit={handleConfirmSchedule}>
           <p>Você está agendando: <strong>{selectedActivity?.name}</strong></p>
-          <p className="modal-subtitle">Com {selectedActivity?.professional} às {selectedActivity?.time}</p>
+          <p className="modal-subtitle">Com {selectedActivity?.professional}</p>
+          <p className="modal-subtitle" style={{fontSize: '0.85rem', color: '#666'}}>Duração estimada: {selectedActivity?.time}</p>
           
           <div className="modal-form-group">
             <label>Escolha a Data:</label>

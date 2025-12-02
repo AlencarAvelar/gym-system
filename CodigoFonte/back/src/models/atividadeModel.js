@@ -2,26 +2,28 @@ const pool = require('../config/database');
 
 class AtividadeModel {
   /**
-   * Listar todas as atividades
-   */
+     * Listar todas as atividades (Com nome do profissional)
+     */
   static async findAll() {
     const query = `
       SELECT 
-        id_atividade,
-        nome_atividade,
-        tipo_atividade,
-        descricao,
-        duracao,
-        capacidade_max,
-        id_profissional,
+        a.id_atividade,
+        a.nome_atividade,
+        a.tipo_atividade,
+        a.descricao,
+        a.duracao,
+        a.capacidade_max,
+        a.id_profissional,
+        u.nome as nome_profissional, -- AQUI ESTÁ A MÁGICA
         (SELECT COUNT(*) FROM agendamento ag 
          WHERE ag.id_atividade = a.id_atividade AND ag.status = 'Ativo') as agendamentos_ativos,
-        (capacidade_max - COALESCE((SELECT COUNT(*) FROM agendamento ag 
+        (a.capacidade_max - COALESCE((SELECT COUNT(*) FROM agendamento ag 
          WHERE ag.id_atividade = a.id_atividade AND ag.status = 'Ativo'), 0)) as vagas_disponiveis
       FROM atividade a
-      ORDER BY nome_atividade;
+      LEFT JOIN usuario u ON a.id_profissional = u.id_usuario -- CRUZAMENTO COM USUÁRIO
+      ORDER BY a.nome_atividade;
     `;
-    
+
     try {
       const result = await pool.query(query);
       return result.rows;
@@ -55,7 +57,7 @@ class AtividadeModel {
         WHERE ag.id_atividade = a.id_atividade AND ag.status = 'Ativo'), 0)) > 0
       ORDER BY nome_atividade;
     `;
-    
+
     try {
       const result = await pool.query(query);
       return result.rows;
@@ -69,15 +71,15 @@ class AtividadeModel {
    * Criar nova atividade
    */
   static async create(atividade) {
-    const { 
-      nome_atividade, 
-      tipo_atividade, 
-      descricao, 
-      duracao, 
-      capacidade_max, 
-      id_profissional 
+    const {
+      nome_atividade,
+      tipo_atividade,
+      descricao,
+      duracao,
+      capacidade_max,
+      id_profissional
     } = atividade;
-    
+
     const query = `
       INSERT INTO atividade (
         nome_atividade, 
@@ -90,16 +92,16 @@ class AtividadeModel {
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
     `;
-    
+
     const values = [
-      nome_atividade, 
-      tipo_atividade, 
-      descricao, 
-      duracao, 
-      capacidade_max, 
+      nome_atividade,
+      tipo_atividade,
+      descricao,
+      duracao,
+      capacidade_max,
       id_profissional
     ];
-    
+
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
@@ -122,7 +124,7 @@ class AtividadeModel {
       LEFT JOIN usuario u ON a.id_profissional = u.id_usuario
       WHERE a.id_atividade = $1;
     `;
-    
+
     try {
       const result = await pool.query(query, [id]);
       return result.rows[0];
@@ -135,15 +137,20 @@ class AtividadeModel {
   /**
    * Atualizar atividade
    */
+  /**
+     * Atualizar atividade
+     */
   static async update(id, atividadeData) {
-    const { 
-      nome_atividade, 
-      tipo_atividade, 
-      descricao, 
-      duracao, 
-      capacidade_max 
+    const {
+      nome_atividade,
+      tipo_atividade,
+      descricao,
+      duracao,
+      capacidade_max,
+      id_profissional // <--- NOVO: Extraímos o ID daqui
     } = atividadeData;
-    
+
+    // CORREÇÃO: Adicionamos id_profissional = $6 no SQL
     const query = `
       UPDATE atividade
       SET 
@@ -151,20 +158,23 @@ class AtividadeModel {
         tipo_atividade = $2,
         descricao = $3,
         duracao = $4,
-        capacidade_max = $5
-      WHERE id_atividade = $6
+        capacidade_max = $5,
+        id_profissional = $6
+      WHERE id_atividade = $7
       RETURNING *;
     `;
-    
+
+    // CORREÇÃO: Adicionamos o valor no array e mudamos o ID para a posição 7
     const values = [
       nome_atividade,
       tipo_atividade,
       descricao,
       duracao,
       capacidade_max,
+      id_profissional,
       id
     ];
-    
+
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
@@ -187,7 +197,7 @@ class AtividadeModel {
       WHERE a.id_profissional = $1
       ORDER BY a.nome_atividade;
     `;
-    
+
     try {
       const result = await pool.query(query, [idProfissional]);
       return result.rows;
@@ -202,7 +212,7 @@ class AtividadeModel {
    */
   static async delete(id) {
     const query = `DELETE FROM atividade WHERE id_atividade = $1`;
-    
+
     try {
       const result = await pool.query(query, [id]);
       return result;

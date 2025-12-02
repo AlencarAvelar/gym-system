@@ -1,45 +1,42 @@
 import api from './api';
+import { getAvailableActivities } from './activityService'; // Importamos para pegar as vagas
 
 // GET: Buscar MEUS agendamentos
 export const getMyAppointments = async () => {
   try {
-    // 1. Chama a rota do Back-End
-    // (Pergunte ao Alencar se a rota é '/agendamentos' mesmo e se ela já filtra pelo usuário logado)
-    const response = await api.get('/agendamentos'); 
+    // 1. Busca os agendamentos do usuário
+    const responseAppointments = await api.get('/agendamentos');
+    const listaAgendamentos = responseAppointments.data.data || [];
 
-    // 2. MAPPER (Tradutor)
-    // O Front espera: id, activity, type, professional, date, time
-    // O Back manda: id_agendamento, atividade: { nome, tipo }, profissional: { nome }, data_agendada, horario_agendado
-    
-    const dataAdapted = response.data.map(item => {
-      // Tratamento de data para formato legível (dd/mm/aaaa) ou input (aaaa-mm-dd)
-      // Aqui vamos assumir que vem algo como "2025-11-20T00:00:00.000Z" ou direto "2025-11-20"
+    // 2. Busca todas as atividades disponíveis (que contém a info de vagas atualizada)
+    const atividadesDetalhadas = await getAvailableActivities();
+
+    const dataAdapted = listaAgendamentos.map(item => {
       const rawDate = item.data_agendada ? item.data_agendada.split('T')[0] : '';
+      const rawTime = item.horario_agendado ? item.horario_agendado.slice(0, 5) : '';
+
+      // Tenta encontrar a atividade correspondente para pegar as vagas reais
+      const atividadeInfo = atividadesDetalhadas.find(atv => atv.id === item.id_atividade);
       
-      // Formata para exibição PT-BR (dia/mês/ano) se necessário, ou mantém ISO para o input
-      // Vamos manter ISO (yyyy-mm-dd) pois o input type="date" exige isso, 
-      // mas na tela podemos formatar visualmente depois se quiser.
-      
+      // Se achou, usa as vagas dela. Se não, usa um fallback.
+      const vagasReais = atividadeInfo ? atividadeInfo.vacancies : "-";
+
       return {
         id: item.id_agendamento,
-        
-        // Dados aninhados (JOINs do backend)
-        activity: item.atividade?.nome || "Atividade", 
-        type: item.atividade?.tipo || "Treino", 
-        
-        // Nome do professor
-        professional: item.profissional?.nome || "Instrutor",
-        
+        // Garante que mostramos o nome, seja do join do agendamento ou da busca cruzada
+        activity: item.nome_atividade || (atividadeInfo ? atividadeInfo.name : "Atividade"), 
+        type: item.tipo_atividade || (atividadeInfo ? atividadeInfo.type : "Treino"), 
+        professional: item.nome_profissional || "Instrutor",
         date: rawDate, 
-        time: item.horario_agendado?.slice(0, 5), // Pega só HH:mm (corta os segundos se tiver)
-        
-        // O agendamento em si não tem "vagas", mas a atividade tem.
-        // Se o back mandar, usamos. Se não, deixamos genérico.
-        vacancies: item.atividade ? `${item.atividade.capacidade_atual || 0}/${item.atividade.capacidade_maxima}` : "-"
+        time: rawTime,
+        vacancies: vagasReais, // <--- AQUI ESTÁ A CORREÇÃO VISUAL
+        status: item.status 
       };
     });
 
-    return dataAdapted;
+    // Filtra para não mostrar os cancelados na lista principal
+    return dataAdapted.filter(item => item.status !== 'Cancelado');
+
   } catch (error) {
     console.error("Erro ao buscar agendamentos:", error);
     return [];
@@ -53,6 +50,8 @@ export const deleteAppointment = async (id) => {
     return true;
   } catch (error) {
     console.error("Erro ao excluir agendamento:", error);
+    const msg = error.response?.data?.message || "Erro ao cancelar.";
+    alert(msg); 
     throw error;
   }
 };
@@ -69,6 +68,8 @@ export const updateAppointment = async (updatedItem) => {
     return response.data;
   } catch (error) {
     console.error("Erro ao atualizar agendamento:", error);
+    const msg = error.response?.data?.message || "Erro ao remarcar.";
+    alert(msg);
     throw error;
   }
 };

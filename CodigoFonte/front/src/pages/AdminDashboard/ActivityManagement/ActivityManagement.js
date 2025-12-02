@@ -32,16 +32,13 @@ function ActivityManagement() {
   
   const [selectedActivity, setSelectedActivity] = useState(null);
 
-  // --- FILTRO BLINDADO ---
+  // Filtro Blindado
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
-    
     const searchLower = searchTerm.toLowerCase();
     const nameSafe = (item.name || '').toLowerCase();
     const profSafe = (item.professional || '').toLowerCase();
-
     const matchesSearch = nameSafe.includes(searchLower) || profSafe.includes(searchLower);
-    
     return matchesType && matchesSearch;
   });
 
@@ -60,51 +57,43 @@ function ActivityManagement() {
   };
 
   const handleEdit = (activity) => {
-    setSelectedActivity({ ...activity });
+    // Clona e garante que professionalId exista (usando o id oculto que guardamos no service)
+    setSelectedActivity({ 
+        ...activity,
+        // Garante que o input de número receba o valor correto
+        professionalId: activity.professionalId || '' 
+    });
     setEditModalOpen(true);
   };
 
   const confirmEdit = async (e) => {
     e.preventDefault();
-    const updated = await updateActivityAdmin(selectedActivity);
-    
-    const updatedVisual = {
-        ...selectedActivity,
-        ...updated 
-    };
-
-    setActivities(activities.map(a => a.id === selectedActivity.id ? updatedVisual : a));
-    setEditModalOpen(false);
-    alert("Atividade atualizada com sucesso!");
-  };
-
-  // --- CRIAÇÃO DE ATIVIDADE ---
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    
     try {
-      const rawCreated = await createActivityAdmin(selectedActivity);
-      
-      const newVisualActivity = {
-        id: rawCreated.id_atividade,
-        name: rawCreated.nome_atividade,
-        type: rawCreated.tipo_atividade,
-        description: rawCreated.descricao,
-        duration: `${rawCreated.duracao} min`,
-        capacity: rawCreated.capacidade_max,
-        professional: `Instrutor (ID: ${rawCreated.id_profissional})`, 
-        time: "A definir",
-        vacancies: `${rawCreated.capacidade_max}/${rawCreated.capacidade_max}`
-      };
-
-      setActivities([...activities, newVisualActivity]);
-      setCreateModalOpen(false);
-      alert("Nova atividade cadastrada com sucesso!");
+        const updated = await updateActivityAdmin(selectedActivity);
+        
+        // Atualiza a lista visualmente
+        await loadData(); // Recarrega para garantir consistência
+        
+        setEditModalOpen(false);
+        alert("Atividade atualizada com sucesso!");
     } catch (error) {
-      // O erro já foi tratado com alert no Service
+        // Erro já tratado no service com alert
     }
   };
 
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    try {
+      await createActivityAdmin(selectedActivity);
+      setCreateModalOpen(false);
+      await loadData(); // Recarrega tudo
+      alert("Nova atividade cadastrada com sucesso!");
+    } catch (error) {
+      // Erro tratado no service
+    }
+  };
+
+  // Handler genérico para inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelectedActivity(prev => ({ ...prev, [name]: value }));
@@ -193,17 +182,17 @@ function ActivityManagement() {
             </div>
           </div>
           
-          {/* MUDANÇA: Campo manual para testar IDs */}
+          {/* CAMPO DE PROFISSIONAL (CRIAÇÃO) */}
           <div className="modal-form-group">
-            <label>ID do Profissional (Número):</label>
+            <label>ID do Profissional:</label>
             <input 
               type="number" 
-              name="professional" 
+              name="professional" // Mapeado no service para id_profissional
               placeholder="Ex: 1, 2, 3..." 
               required 
               onChange={handleChange} 
             />
-            <small style={{color: '#666', fontSize: '0.8rem'}}>Verifique no banco qual ID é de um professor.</small>
+            <small style={{color: '#666', fontSize: '0.8rem'}}>Olhe no banco qual o ID de um professor válido.</small>
           </div>
 
           <div className="modal-actions">
@@ -233,13 +222,26 @@ function ActivityManagement() {
           </div>
           <div className="modal-row">
             <div className="modal-form-group">
-              <label>Duração:</label>
+              <label>Duração (min):</label>
               <input type="text" name="duration" defaultValue={selectedActivity?.duration} onChange={handleChange} />
             </div>
             <div className="modal-form-group">
               <label>Capacidade Máxima:</label>
               <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
+          </div>
+          
+          {/* CAMPO DE PROFISSIONAL (EDIÇÃO - ADICIONADO) */}
+          <div className="modal-form-group">
+            <label>ID do Profissional:</label>
+            <input 
+              type="number" 
+              name="professionalId" // Mapeado no service
+              defaultValue={selectedActivity?.professionalId} 
+              required
+              onChange={handleChange} 
+            />
+            <small style={{color: '#666', fontSize: '0.8rem'}}>Você pode transferir a aula para outro professor.</small>
           </div>
 
           <div className="modal-actions">
@@ -249,7 +251,7 @@ function ActivityManagement() {
         </form>
       </Modal>
 
-      {/* Modal Exclusão */}
+      {/* Modal Exclusão (Mantido igual) */}
       <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Excluir Atividade">
         <p>Tem certeza que deseja excluir <strong>{selectedActivity?.name}</strong>?</p>
         <div className="modal-actions">

@@ -38,7 +38,7 @@ router.post('/',
 // [RF007] Consultar agendamentos (cliente/profs)
 router.get('/', 
   protect, 
-  restrictTo('Cliente', 'Professor', 'Personal Trainer'), 
+  restrictTo('Cliente', 'Professor', 'Personal Trainer', 'Administrador'), 
   AgendamentoController.getAll
 );
 

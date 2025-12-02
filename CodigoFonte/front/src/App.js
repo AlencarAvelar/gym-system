@@ -39,8 +39,16 @@ function App() {
               <Login />
               {/* Seção Dummy */}
               <div id="sobre-section" className="dummy-section">
+                <h2>O que oferecemos</h2>
                 {/* ... seu texto ... */}
-                <p>Descubra um novo jeito de treinar...</p>
+                <p className="landing-subtitle">
+                  Mais do que apenas uma academia, o Gym System é o ponto de partida para a sua <strong>revolução pessoal</strong>.
+                  Aqui, unimos tecnologia de ponta e infraestrutura de elite para criar uma experiência de treino que vai muito além do esforço físico:
+                  é sobre <strong>superar limites</strong>, construir disciplina e alcançar a <strong>melhor versão de si mesmo</strong>.
+                  Com uma equipe de especialistas apaixonados e uma variedade de modalidades desenhadas para todos os objetivos,
+                  oferecemos o suporte necessário para que cada movimento conte. Não deixe para depois a saúde que você merece hoje;
+                  junte-se a uma comunidade que <strong>transpira evolução</strong>.
+                </p>
               </div>
               <Footer />
             </>
