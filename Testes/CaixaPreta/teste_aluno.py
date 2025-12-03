@@ -19,7 +19,7 @@ class TestesAluno(unittest.TestCase):
         prefs = {
             "credentials_enable_service": False,
             "profile.password_manager_enabled": False,
-            "profile.password_manager_leak_detection": False, # ESTA é a chave para o alerta de vazamento
+            "profile.password_manager_leak_detection": False, #chave para o alerta de vazamento
             "safebrowsing.enabled": False,
             "safebrowsing.disable_download_protection": True,
             "profile.default_content_setting_values.notifications": 2 # Bloqueia notificações

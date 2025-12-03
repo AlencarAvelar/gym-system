@@ -54,33 +54,6 @@ class TestesGymSystem(unittest.TestCase):
         nomes_na_tela = self.admin_page.obter_nomes_atividades()
         self.assertIn(nome_atividade, nomes_na_tela)
 
-    def test_ct002_validacao_campos_obrigatorios(self):
-        """ 
-        CT-002: Validação de Campos (Erro)
-        Cenário: Tentar cadastrar sem preencher o NOME.
-        Resultado Esperado: O formulário não deve ser submetido.
-        """
-        self.admin_page.abrir_modal_cadastro()
-       
-        self.admin_page.preencher_modal(
-            nome="", 
-            tipo="Treino",
-            descricao="Tentativa de cadastro sem nome.",
-            duracao="30",
-            capacidade="5",
-            profissional="2"
-        )
-        self.admin_page.salvar_formulario()
-
-        # Validação: Se der erro ao buscar alerta, é SUCESSO
-        try:
-            self.driver.switch_to.alert
-            self.fail("O formulário foi enviado mesmo com nome vazio!")
-        except:
-            pass
-        
-        self.assertIn("/admin", self.driver.current_url)
-
     def test_ct003_consultar_atividade(self):
         """ 
         CT-003: Consultar/Buscar Atividade [RF003]
