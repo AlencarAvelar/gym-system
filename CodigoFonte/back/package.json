@@ -16,7 +16,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -27,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/AlencarAvelar/gym-system/issues"
   },
-  "homepage": "https://github.com/AlencarAvelar/gym-system#readme"
+  "homepage": "https://github.com/AlencarAvelar/gym-system#readme",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
 }
