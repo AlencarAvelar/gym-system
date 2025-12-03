@@ -27,23 +27,35 @@ Essa solução tornará o processo mais eficiente, reduzindo erros operacionais 
 | **Banco de Dados** | PostgreSQL | v18.0 |
 | **IDE** | Visual Studio Code | - |
 | **Gerenciador de Pacotes** | npm | -2.0+ |
-| **Containerização (Futuro)** | Docker | - |
-
 
 ---
 
-## 📁 Estrutura do Diretório
-> *Ainda em desenvolvimento*
+## 📁 **Estrutura do Projeto**
 
-```
+``` bash
 gym-system/
-|-- Documentacao/
-|-- front/
-|-- back/
-|-- README.md
+│
+├── CodigoFonte/
+│   ├── back/              # API e Lógica do Servidor (Node.js)
+│   │   ├── src/
+│   │   ├── .env
+│   │   └── server.js
+│   │
+│   └── front/             # Interface (React)
+│       ├── public/
+│       └── src/
+│
+├── Documentacao/
+│   ├── PadroesAdotados/
+│   ├── Requisitos/
+│   └── Testes/
+│
+├── .gitignore
+├── CONTRIBUTING.md
+├── LICENSE
+└── README.md
 ```
 
----
 
 
 ## 🚀 Quick Start (Início Rápido)
@@ -196,6 +208,30 @@ A aplicação estará disponível em: `http://localhost:3000`
 
 ---
 
+# 📖 **Guia de Uso do Sistema (Usuários Finais)**
+
+## 👤 **Clientes**
+
+-   Visualização de grade de aulas\
+-   Inscrição em horários\
+-   Histórico de participações\
+-   Painel com próximos treinos
+
+## 🎓 **Professores / Personais**
+
+-   Gerenciamento de agenda\
+-   Abertura e cancelamento de horários\
+-   Check-in de alunos
+
+## 🛡️ **Administradores**
+
+-   Controle de usuários\
+-   Relatórios de uso\
+-   Monitoramento da ocupação da academia
+
+------------------------------------------------------------------------
+
+
 ## 👥 Equipe de Desenvolvimento
 - **Alencar Henrique Lage Avelar**
 - **Letícia Gabriella Nascimento de Morais**
@@ -204,7 +240,8 @@ A aplicação estará disponível em: `http://localhost:3000`
 ---
 
 ## 🚀 Status do Projeto
-Sprint 1 — *Especificação do Produto*
+
+📌 **Sprint 3 --- Finalização da Implementação e Testes**
 
 ---
 
