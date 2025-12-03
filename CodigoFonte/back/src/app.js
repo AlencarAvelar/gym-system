@@ -1,27 +1,27 @@
 const express = require('express');
 const cors = require('cors');
-const cookieParser = require('cookie-parser'); // ← ADICIONAR
+const cookieParser = require('cookie-parser'); 
 require('dotenv').config();
 
-const atividadeRoutes = require('./routes/atividadeRoutes'); // ← ATUALIZAR
-const agendamentoRoutes = require('./routes/agendamentoRoutes'); // ← ATUALIZAR
-const authRoutes = require('./routes/authRoutes'); // ← NOVO
+const atividadeRoutes = require('./routes/atividadeRoutes'); 
+const agendamentoRoutes = require('./routes/agendamentoRoutes'); 
+const authRoutes = require('./routes/authRoutes'); 
 
 const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], // Frontend URLs
-  credentials: true // ← IMPORTANTE para cookies
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], 
+  credentials: true 
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // ← ADICIONAR para cookies
+app.use(cookieParser()); 
 
 // Rotas da API
 app.use('/api/auth', authRoutes); // ← NOVO
-app.use('/api/atividades', atividadeRoutes); // ← JÁ EXISTE
-app.use('/api/agendamentos', agendamentoRoutes); // ← JÁ EXISTE
+app.use('/api/atividades', atividadeRoutes); 
+app.use('/api/agendamentos', agendamentoRoutes); 
 
 // Rota de teste
 app.get('/', (req, res) => {

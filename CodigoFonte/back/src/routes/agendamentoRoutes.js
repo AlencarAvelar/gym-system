@@ -5,7 +5,7 @@ const { validateAgendamento, validateAgendamentoUpdate } = require('../middlewar
 const { protect, restrictTo } = require('../middlewares/authMiddleware'); // ← ADICIONAR
 
 // ============================================
-// ROTAS PÚBLICAS (para testes sem autenticação)
+// ROTAS PÚBLICAS 
 // ============================================
 
 // Criar agendamento público (para testes)
@@ -24,7 +24,7 @@ router.delete('/public/:id', AgendamentoController.cancelPublic);
 router.get('/public/:id', AgendamentoController.getById);
 
 // ============================================
-// ROTAS PROTEGIDAS (para produção)
+// ROTAS PROTEGIDAS 
 // ============================================
 
 // [RF006] Criar agendamento (apenas cliente logado)
