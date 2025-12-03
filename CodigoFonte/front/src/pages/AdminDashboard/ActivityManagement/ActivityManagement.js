@@ -3,15 +3,26 @@ import Modal from '../../../components/Modal/Modal';
 import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService';
 import './ActivityManagement.css';
 
+/**
+ * Componente da tela "Gerenciamento de Atividades" (Painel do Admin).
+ * Permite ao administrador visualizar, criar, editar e excluir qualquer atividade do sistema.
+ */
 function ActivityManagement() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS ---
-  useEffect(() => {
-    loadData();
-  }, []);
+  const [filterType, setFilterType] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  /**
+   * Carrega a lista completa de atividades.
+   */
   const loadData = async () => {
     try {
       const data = await getAllActivities();
@@ -23,25 +34,22 @@ function ActivityManagement() {
     }
   };
 
-  const [filterType, setFilterType] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  
-  const [selectedActivity, setSelectedActivity] = useState(null);
-
-  // --- FILTRO BLINDADO ---
+  /**
+   * Filtra as atividades por tipo, nome e profissional.
+   */
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
-    
+
     const searchLower = searchTerm.toLowerCase();
     const nameSafe = (item.name || '').toLowerCase();
     const profSafe = (item.professional || '').toLowerCase();
 
     const matchesSearch = nameSafe.includes(searchLower) || profSafe.includes(searchLower);
-    
+
     return matchesType && matchesSearch;
   });
 
@@ -54,54 +62,44 @@ function ActivityManagement() {
 
   const confirmDelete = async () => {
     await deleteActivityAdmin(selectedActivity.id);
-    setActivities(activities.filter(a => a.id !== selectedActivity.id));
+    setActivities(prev => prev.filter(a => a.id !== selectedActivity.id));
     setDeleteModalOpen(false);
     alert("Atividade excluída pelo Administrador.");
   };
 
   const handleEdit = (activity) => {
-    setSelectedActivity({ ...activity });
+    // Prepara o objeto para edição, mantendo o ID do profissional oculto
+    setSelectedActivity({
+      ...activity,
+      professionalId: activity.professionalId || ''
+    });
     setEditModalOpen(true);
   };
 
   const confirmEdit = async (e) => {
     e.preventDefault();
-    const updated = await updateActivityAdmin(selectedActivity);
-    
-    const updatedVisual = {
-        ...selectedActivity,
-        ...updated 
-    };
+    try {
+      const updated = await updateActivityAdmin(selectedActivity);
 
-    setActivities(activities.map(a => a.id === selectedActivity.id ? updatedVisual : a));
-    setEditModalOpen(false);
-    alert("Atividade atualizada com sucesso!");
+      // Recarrega dados para garantir sincronia total com o backend
+      await loadData();
+
+      setEditModalOpen(false);
+      alert("Atividade atualizada com sucesso!");
+    } catch (error) {
+      // Erro tratado no serviço
+    }
   };
 
-  // --- CRIAÇÃO DE ATIVIDADE ---
   const handleCreate = async (e) => {
     e.preventDefault();
-    
     try {
-      const rawCreated = await createActivityAdmin(selectedActivity);
-      
-      const newVisualActivity = {
-        id: rawCreated.id_atividade,
-        name: rawCreated.nome_atividade,
-        type: rawCreated.tipo_atividade,
-        description: rawCreated.descricao,
-        duration: `${rawCreated.duracao} min`,
-        capacity: rawCreated.capacidade_max,
-        professional: `Instrutor (ID: ${rawCreated.id_profissional})`, 
-        time: "A definir",
-        vacancies: `${rawCreated.capacidade_max}/${rawCreated.capacidade_max}`
-      };
-
-      setActivities([...activities, newVisualActivity]);
+      await createActivityAdmin(selectedActivity);
       setCreateModalOpen(false);
+      await loadData();
       alert("Nova atividade cadastrada com sucesso!");
     } catch (error) {
-      // O erro já foi tratado com alert no Service
+      // Erro tratado no serviço
     }
   };
 
@@ -128,9 +126,9 @@ function ActivityManagement() {
 
       <div className="filters-wrapper-admin">
         <div className="search-box">
-          <input 
-            type="text" 
-            placeholder="Buscar por nome ou profissional..." 
+          <input
+            type="text"
+            placeholder="Buscar por nome ou profissional..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -192,18 +190,17 @@ function ActivityManagement() {
               <input type="number" name="capacity" required onChange={handleChange} />
             </div>
           </div>
-          
-          {/* MUDANÇA: Campo manual para testar IDs */}
+
           <div className="modal-form-group">
-            <label>ID do Profissional (Número):</label>
-            <input 
-              type="number" 
-              name="professional" 
-              placeholder="Ex: 1, 2, 3..." 
-              required 
-              onChange={handleChange} 
+            <label>ID do Profissional:</label>
+            <input
+              type="number"
+              name="professional"
+              placeholder="Ex: 1, 2, 3..."
+              required
+              onChange={handleChange}
             />
-            <small style={{color: '#666', fontSize: '0.8rem'}}>Verifique no banco qual ID é de um professor.</small>
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Olhe no banco qual o ID de um professor válido.</small>
           </div>
 
           <div className="modal-actions">
@@ -233,13 +230,25 @@ function ActivityManagement() {
           </div>
           <div className="modal-row">
             <div className="modal-form-group">
-              <label>Duração:</label>
+              <label>Duração (min):</label>
               <input type="text" name="duration" defaultValue={selectedActivity?.duration} onChange={handleChange} />
             </div>
             <div className="modal-form-group">
               <label>Capacidade Máxima:</label>
               <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
+          </div>
+
+          <div className="modal-form-group">
+            <label>ID do Profissional:</label>
+            <input
+              type="number"
+              name="professionalId"
+              defaultValue={selectedActivity?.professionalId}
+              required
+              onChange={handleChange}
+            />
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Você pode transferir a aula para outro professor.</small>
           </div>
 
           <div className="modal-actions">

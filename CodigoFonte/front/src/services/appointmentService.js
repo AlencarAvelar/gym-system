@@ -1,74 +1,98 @@
 import api from './api';
+import { getAvailableActivities } from './activityService';
 
-// GET: Buscar MEUS agendamentos
+/**
+ * Módulo de serviços para gerenciamento de Agendamentos (visão do Cliente).
+ * Responsável por listar, atualizar e cancelar os agendamentos do usuário.
+ */
+
+/**
+ * Recupera a lista de agendamentos do usuário logado.
+ * Realiza um cruzamento de dados com o serviço de atividades para obter informações
+ * atualizadas de vagas, já que o endpoint de agendamento não fornece esse dado diretamente.
+ * * * @returns {Promise<Array>} Lista de agendamentos formatada e filtrada (sem cancelados).
+ */
 export const getMyAppointments = async () => {
   try {
-    // 1. Chama a rota do Back-End
-    // (Pergunte ao Alencar se a rota é '/agendamentos' mesmo e se ela já filtra pelo usuário logado)
-    const response = await api.get('/agendamentos'); 
+    // Busca paralela ou sequencial dos dados necessários
+    const responseAppointments = await api.get('/agendamentos');
+    const listaAgendamentos = responseAppointments.data.data || [];
 
-    // 2. MAPPER (Tradutor)
-    // O Front espera: id, activity, type, professional, date, time
-    // O Back manda: id_agendamento, atividade: { nome, tipo }, profissional: { nome }, data_agendada, horario_agendado
-    
-    const dataAdapted = response.data.map(item => {
-      // Tratamento de data para formato legível (dd/mm/aaaa) ou input (aaaa-mm-dd)
-      // Aqui vamos assumir que vem algo como "2025-11-20T00:00:00.000Z" ou direto "2025-11-20"
+    // Busca detalhes das atividades para enriquecer os dados (ex: vagas reais)
+    const atividadesDetalhadas = await getAvailableActivities();
+
+    const dataAdapted = listaAgendamentos.map(item => {
       const rawDate = item.data_agendada ? item.data_agendada.split('T')[0] : '';
-      
-      // Formata para exibição PT-BR (dia/mês/ano) se necessário, ou mantém ISO para o input
-      // Vamos manter ISO (yyyy-mm-dd) pois o input type="date" exige isso, 
-      // mas na tela podemos formatar visualmente depois se quiser.
-      
+      const rawTime = item.horario_agendado ? item.horario_agendado.slice(0, 5) : '';
+
+      // Encontra a atividade correspondente para obter metadados atualizados
+      const atividadeInfo = atividadesDetalhadas.find(atv => atv.id === item.id_atividade);
+
+      const vagasReais = atividadeInfo ? atividadeInfo.vacancies : "-";
+
       return {
         id: item.id_agendamento,
-        
-        // Dados aninhados (JOINs do backend)
-        activity: item.atividade?.nome || "Atividade", 
-        type: item.atividade?.tipo || "Treino", 
-        
-        // Nome do professor
-        professional: item.profissional?.nome || "Instrutor",
-        
-        date: rawDate, 
-        time: item.horario_agendado?.slice(0, 5), // Pega só HH:mm (corta os segundos se tiver)
-        
-        // O agendamento em si não tem "vagas", mas a atividade tem.
-        // Se o back mandar, usamos. Se não, deixamos genérico.
-        vacancies: item.atividade ? `${item.atividade.capacidade_atual || 0}/${item.atividade.capacidade_maxima}` : "-"
+        // Prioriza o nome vindo do join, ou usa o fallback do cruzamento
+        activity: item.nome_atividade || (atividadeInfo ? atividadeInfo.name : "Atividade"),
+        type: item.tipo_atividade || (atividadeInfo ? atividadeInfo.type : "Treino"),
+        professional: item.nome_profissional || "Instrutor",
+        date: rawDate,
+        time: rawTime,
+        vacancies: vagasReais,
+        status: item.status
       };
     });
 
-    return dataAdapted;
+    // Regra de Negócio: O cliente não precisa ver agendamentos cancelados na lista principal
+    return dataAdapted.filter(item => item.status !== 'Cancelado');
+
   } catch (error) {
     console.error("Erro ao buscar agendamentos:", error);
     return [];
   }
 };
 
-// DELETE: Cancelar agendamento
+/**
+ * Cancela um agendamento existente.
+ * * @param {number|string} id - O identificador do agendamento.
+ * @returns {Promise<boolean>} Retorna true em caso de sucesso.
+ * @throws {Object} Objeto de erro contendo a resposta do servidor.
+ */
 export const deleteAppointment = async (id) => {
   try {
     await api.delete(`/agendamentos/${id}`);
     return true;
   } catch (error) {
     console.error("Erro ao excluir agendamento:", error);
+
+    const msg = error.response?.data?.message || "Erro ao cancelar.";
+    alert(msg);
+
     throw error;
   }
 };
 
-// PUT: Atualizar agendamento (Remarcar)
+/**
+ * Atualiza a data e horário de um agendamento (Remarcação).
+ * * @param {Object} updatedItem - Objeto contendo id, date e time novos.
+ * @returns {Promise<Object>} Os dados do agendamento atualizado.
+ * @throws {Object} Objeto de erro contendo a resposta do servidor.
+ */
 export const updateAppointment = async (updatedItem) => {
   try {
     const payload = {
       data_agendada: updatedItem.date,
       horario_agendado: updatedItem.time
     };
-    
+
     const response = await api.put(`/agendamentos/${updatedItem.id}`, payload);
     return response.data;
   } catch (error) {
     console.error("Erro ao atualizar agendamento:", error);
+
+    const msg = error.response?.data?.message || "Erro ao remarcar.";
+    alert(msg);
+
     throw error;
   }
 };

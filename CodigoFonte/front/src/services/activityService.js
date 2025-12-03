@@ -1,42 +1,62 @@
 import api from './api';
 
-// GET: Buscar atividades disponíveis (Conectado ao Back-End)
+/**
+ * Módulo de serviços relacionados a Atividades (visão do Cliente).
+ * Responsável por buscar aulas disponíveis e realizar agendamentos.
+ */
+
+/**
+ * Recupera a lista de atividades disponíveis para agendamento.
+ * Filtra e formata os dados vindos do backend para exibição no card do cliente.
+ * * @returns {Promise<Array>} Lista de atividades formatada com status de vagas.
+ */
 export const getAvailableActivities = async () => {
   try {
-    // 1. Chama a rota real do Alencar
-    const response = await api.get('/atividades'); 
+    const response = await api.get('/atividades/disponiveis');
 
-    // 2. MAPPER (O Tradutor)
-    // O Back manda: { id_atividade, nome, tipo, capacidade_maxima, ... }
-    // O Front espera: { id, name, type, vacancies, ... }
-    const dataAdapted = response.data.map(item => ({
-      id: item.id_atividade,          
-      name: item.nome,                
-      type: item.tipo,                
-      
-      // Tenta pegar o nome do professor se vier populado, senão põe genérico
-      professional: item.usuario?.nome || "Instrutor", 
-      
-      // O horário não vem no cadastro da atividade, então mantemos o texto padrão
-      time: "A definir",              
-      
-      // Mostra Capacidade (Ex: "20/20")
-      // Nota: Se o back não mandar quantos já agendaram, assumimos 0 por enquanto
-      vacancies: `${item.capacidade_atual || 0}/${item.capacidade_maxima}`
-    }));
+    // Garante que a resposta seja tratada como array
+    const lista = response.data.data || [];
 
-    return dataAdapted;
+    return lista.map(item => {
+      const total = parseInt(item.capacidade_max || 0);
+      const disponiveis = parseInt(item.vagas_disponiveis || 0);
+
+      // Calcula o número de vagas ocupadas para exibição "Ocupadas/Total"
+      const ocupadas = total - disponiveis;
+
+      // Define se a atividade está lotada (sem vagas livres)
+      const isFull = disponiveis <= 0;
+
+      return {
+        id: item.id_atividade,
+        name: item.nome_atividade,
+        type: item.tipo_atividade,
+        professional: item.nome_profissional || "Instrutor",
+
+        // Formatação visual
+        time: item.duracao ? `${item.duracao} min` : "-",
+        vacancies: `${ocupadas}/${total}`,
+
+        // Flag booleana para controle de UI (botão desabilitado)
+        isFull: isFull
+      };
+    });
   } catch (error) {
     console.error("Erro ao buscar atividades:", error);
-    return []; // Retorna lista vazia para não quebrar a tela
+    return [];
   }
 };
 
-// POST: Criar um agendamento
+/**
+ * Realiza o agendamento de uma atividade para o cliente logado.
+ * * @param {number|string} activityId - ID da atividade.
+ * @param {string} date - Data do agendamento (YYYY-MM-DD).
+ * @param {string} time - Horário do agendamento (HH:MM).
+ * @returns {Promise<Object>} Dados do agendamento criado.
+ * @throws {string} Mensagem de erro em caso de falha (ex: conflito, sem vaga).
+ */
 export const createSchedule = async (activityId, date, time) => {
   try {
-    // Envia para a rota de agendamento do Alencar
-    // Ajuste o nome dos campos se necessário (ex: id_atividade vs activityId)
     const payload = {
       id_atividade: activityId,
       data_agendada: date,
@@ -47,6 +67,6 @@ export const createSchedule = async (activityId, date, time) => {
     return response.data;
   } catch (error) {
     console.error("Erro ao criar agendamento:", error);
-    throw error; // Lança o erro para a tela tratar
+    throw error.response?.data?.message || "Erro ao realizar agendamento.";
   }
 };

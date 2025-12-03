@@ -1,90 +1,100 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api';
+import { authService } from '../../services/authService';
 import './Login.css';
 
+/**
+ * Componente da página de Login (Home pública).
+ * Apresenta o formulário de autenticação e texto promocional do sistema.
+ */
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  /**
+   * Manipula o envio do formulário de login.
+   * Tenta autenticar via serviço e redireciona o usuário conforme seu perfil.
+   */
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      // 1. A rota correta no back-end é /auth/login
-      const response = await api.post('/auth/login', { 
-        email: email, 
-        senha: password // O back-end espera 'senha', não 'password'
-      });
+      const usuario = await authService.login(email, password);
 
-      // 2. O back-end retorna { success: true, data: { token, usuario } }
-      const { token, usuario } = response.data.data;
+      if (usuario) {
+        const tipo = usuario.tipo_usuario;
 
-      // 3. Salva o Token e o Tipo de Usuário
-      localStorage.setItem('gym_token', token);
-      localStorage.setItem('gym_user_type', usuario.tipo_usuario);
-
-      // 4. Redireciona baseado no tipo retornado pelo banco
-      const tipo = usuario.tipo_usuario; // Ex: 'Administrador', 'Cliente'
-
-      if (tipo === 'Administrador') {
-        navigate('/admin');
-      } else if (tipo === 'Professor' || tipo === 'Personal Trainer') {
-        navigate('/profissional');
-      } else {
-        navigate('/dashboard'); // Cliente
+        if (tipo === 'Administrador') {
+          navigate('/admin');
+        } else if (tipo === 'Professor' || tipo === 'Personal Trainer') {
+          navigate('/profissional');
+        } else {
+          navigate('/dashboard'); // Cliente
+        }
       }
-
-    } catch (err) {
-      console.error("Erro no login:", err);
-      // Tenta pegar a mensagem de erro que o back mandou
-      const msg = err.response?.data?.message || 'E-mail ou senha inválidos.';
-      setError(msg);
+    } catch (msg) {
+      setError(msg || 'Falha no login');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-page"> 
+    <div className="login-page">
       <div className="login-content">
+
+        {/* Seção Promocional (Hero Text) */}
         <div className="attention-text">
-          <h1>Transforme seu corpo.</h1>
-          <h1>Transforme sua vida.</h1>
-          <p>Acesse seu painel e agende seu próximo treino.</p>
+          <h1>Desperte sua</h1>
+          <h1 className="highlight-text">Melhor Versão.</h1>
+
+          <p>
+            Tecnologia e performance unidas para transformar sua rotina.
+            Gerencie seus horários com facilidade, garanta seu lugar nas melhores aulas
+            e foque no que realmente importa: <strong>seus resultados</strong>.
+          </p>
+
+          <p className="sub-text">O primeiro passo para a mudança começa agora.</p>
         </div>
 
+        {/* Formulário de Acesso */}
         <form id="login-form" className="login-form" onSubmit={handleSubmit}>
-          <h2>Área do Cliente</h2>
+          <h2>Acesse sua conta</h2>
 
           {error && <p className="login-error-message">{error}</p>}
-          
+
           <div className="input-group">
             <label htmlFor="email">Email:</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="seuemail@exemplo.com" 
-              required 
+            <input
+              type="email"
+              id="email"
+              placeholder="seuemail@exemplo.com"
+              required
               value={email}
-              onChange={(e) => setEmail(e.target.value)} 
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          
+
           <div className="input-group">
             <label htmlFor="password">Senha:</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="Sua senha" 
-              required 
+            <input
+              type="password"
+              id="password"
+              placeholder="Sua senha"
+              required
               value={password}
-              onChange={(e) => setPassword(e.target.value)} 
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          
-          <button type="submit" className="login-button">Entrar</button>
+
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
 
           <div className="login-links">
             <Link to="/recuperar-senha">Esqueci minha senha</Link>

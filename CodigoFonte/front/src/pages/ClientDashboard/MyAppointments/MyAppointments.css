@@ -1,141 +1,182 @@
+/* =========================================
+   ESTILOS DE "MEUS AGENDAMENTOS"
+   ========================================= */
+
 .appointments-container {
   width: 100%;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Cabeçalho da página (Título + Botão) */
+/* --- Cabeçalho da Página --- */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .page-header h1 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-dark);
   margin: 0;
 }
 
-.new-schedule-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.new-schedule-btn:hover {
-  background-color: #0056b3;
-}
-
-/* Grid dos Cards */
+/* --- Grid de Cards --- */
 .appointments-grid {
   display: grid;
-  /* Responsivo: cria colunas automáticas de min 300px */
+  /* Colunas responsivas: mínimo 300px */
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-/* O Card Individual */
+/* Mensagem de "Sem dados" */
+.no-data-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* --- O Card Individual --- */
 .appointment-card {
-  background: white;
+  background: #ffffff;
   border-radius: 10px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Sombra suave */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border: 1px solid #eee;
-  transition: transform 0.2s;
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .appointment-card:hover {
-  transform: translateY(-3px); /* Levanta um pouco ao passar o mouse */
-  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Tags (Aula/Treino) */
+/* Cabeçalho do Card (Tag + Vagas) */
 .card-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  align-items: center;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
+/* Tags de Tipo */
 .tag {
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 20px;
   text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
 }
 
-.tag.treino { background-color: #e3f2fd; color: #1976d2; }
-.tag.aula { background-color: #f3e5f5; color: #7b1fa2; }
+.tag.treino {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
 
-.status.confirmado { color: #2e7d32; }
-.status.pendente { color: #ed6c02; }
+.tag.aula {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.vacancies-info {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
 
 /* Corpo do Card */
 .card-body h3 {
   margin: 0;
-  font-size: 1.25rem;
-  color: #222;
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  line-height: 1.3;
 }
 
 .professional {
-  color: #666;
-  margin: 0.2rem 0 1rem 0;
+  color: var(--text-muted);
+  margin: 0.3rem 0 1rem 0;
   font-size: 0.9rem;
 }
 
+/* Informações de Data/Hora */
 .datetime-info {
   display: flex;
   gap: 1rem;
-  background-color: #f9f9f9;
+  background-color: var(--bg-light);
   padding: 0.8rem;
   border-radius: 6px;
+  border: 1px solid var(--border-color);
 }
 
 .info-item {
   font-size: 0.9rem;
-  color: #444;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.info-item strong {
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 /* Ações (Botões) */
 .card-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: auto; /* Empurra para o final do card */
+  gap: 0.8rem;
+  margin-top: auto;
+  /* Empurra para o fundo */
 }
 
 .card-actions button {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.6rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
+/* Botão Editar */
 .btn-edit {
-  background-color: #f0f0f0;
-  color: #333;
+  background-color: #e9ecef;
+  color: var(--text-dark);
 }
-.btn-edit:hover { background-color: #e0e0e0; }
 
+.btn-edit:hover:not(:disabled) {
+  background-color: #dee2e6;
+}
+
+.btn-edit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botão Excluir */
 .btn-cancel {
-  background-color: #fff0f0;
-  color: #d32f2f;
+  background-color: #ffe3e3;
+  color: var(--color-danger);
 }
-.btn-cancel:hover { background-color: #ffe0e0; }
 
-/* Adicione isso logo abaixo de .card-header */
-.vacancies-info {
-  color: #666;
-  font-size: 0.85rem;
-  font-weight: 500;
+.btn-cancel:hover:not(:disabled) {
+  background-color: #ffc9c9;
+}
+
+.btn-cancel:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
 }
