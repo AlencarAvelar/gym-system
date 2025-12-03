@@ -22,7 +22,7 @@ class AuthController {
         return res.status(401).json(result);
       }
 
-      // Configurar cookie (opcional)
+      // Configurar cookie
       res.cookie('token', result.data.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

@@ -1,8 +1,13 @@
+/* =========================================
+   ESTILOS DE "CONSULTAR INSCRITOS"
+   ========================================= */
+
 .enrolled-container {
   width: 100%;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Reutilizando estilos do Header */
+/* --- Cabeçalho da Página --- */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -12,42 +17,74 @@
   gap: 1rem;
 }
 
-.page-header h1 { font-size: 1.8rem; color: #333; margin: 0; }
+.page-header h1 {
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  margin: 0;
+}
 
-/* Reutilizando a busca */
-.search-box { position: relative; display: flex; align-items: center; width: 300px; }
-.search-box input { width: 100%; padding: 0.6rem 2.5rem 0.6rem 1rem; border: 1px solid #ddd; border-radius: 25px; outline: none; }
-.search-box input:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); }
-.search-icon { position: absolute; right: 12px; color: #888; }
+/* --- Barra de Busca --- */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 300px;
+}
 
-/* --- ESTILOS DA TABELA --- */
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+  background-color: #ffffff;
+  color: var(--text-dark);
+}
 
-/* Container para permitir scroll no celular se a tabela for larga */
+.search-box input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+/* --- Tabela de Inscritos --- */
 .table-container {
-  background: white;
+  background: #ffffff;
   border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  overflow: hidden; /* Arredonda as bordas da tabela */
-  border: 1px solid #eee;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  /* Permite rolagem horizontal em mobile */
+  border: 1px solid var(--border-color);
 }
 
 .custom-table {
   width: 100%;
-  border-collapse: collapse; /* Remove espaços entre células */
+  border-collapse: collapse;
   text-align: left;
+  min-width: 600px;
+  /* Garante largura mínima para não quebrar layout */
 }
 
 /* Cabeçalho da Tabela */
 .custom-table thead {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #e9ecef;
+  background-color: var(--bg-light);
+  border-bottom: 2px solid var(--border-color);
 }
 
 .custom-table th {
   padding: 1rem 1.5rem;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #555;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -56,27 +93,53 @@
 .custom-table td {
   padding: 1rem 1.5rem;
   font-size: 0.95rem;
-  color: #333;
+  color: var(--text-dark);
   border-bottom: 1px solid #f1f1f1;
 }
 
-/* Efeito Zebrado e Hover nas Linhas */
+/* Remove borda da última linha */
 .custom-table tbody tr:last-child td {
-  border-bottom: none; /* Remove borda da última linha */
+  border-bottom: none;
 }
 
+/* Efeito Hover */
 .custom-table tbody tr:hover {
-  background-color: #f1f8ff; /* Azul bem clarinho ao passar o mouse */
+  background-color: #f8f9fa;
 }
 
-/* Estilos Específicos de Coluna */
-.td-date { color: #666; font-family: monospace; font-size: 0.9rem; }
-.td-time { color: #007bff; font-weight: 600; }
-.td-bold { font-weight: 600; color: #222; }
+/* Colunas Específicas */
+.td-date {
+  color: var(--text-muted);
+  font-family: monospace;
+  font-size: 0.9rem;
+}
 
+.td-time {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.td-bold {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+/* Mensagem de Sem Dados */
 .no-data {
   text-align: center;
   padding: 3rem;
-  color: #999;
+  color: var(--text-muted);
   font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    width: 100%;
+  }
 }

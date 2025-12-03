@@ -6,18 +6,45 @@ class AgendamentoModel {
    */
   static async create(agendamento) {
     const { id_cliente, id_atividade, data_agendada, horario_agendado } = agendamento;
-    
+
     const query = `
       INSERT INTO agendamento (id_cliente, id_atividade, data_agendada, horario_agendado)
       VALUES ($1, $2, $3, $4)
       RETURNING *;
     `;
-    
+
     const values = [id_cliente, id_atividade, data_agendada, horario_agendado];
-    
+
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Buscar TODOS os agendamentos (Para Admin)
+   */
+  static async findAll() {
+    const query = `
+      SELECT 
+        ag.*,
+        at.nome_atividade,
+        at.tipo_atividade,
+        at.duracao,
+        u_prof.nome as nome_profissional,
+        u_cliente.nome as nome_cliente
+      FROM agendamento ag
+      INNER JOIN atividade at ON ag.id_atividade = at.id_atividade
+      INNER JOIN usuario u_prof ON at.id_profissional = u_prof.id_usuario
+      INNER JOIN usuario u_cliente ON ag.id_cliente = u_cliente.id_usuario
+      ORDER BY ag.data_agendada DESC, ag.horario_agendado DESC;
+    `;
+
+    try {
+      const result = await pool.query(query);
+      return result.rows;
     } catch (error) {
       throw error;
     }
@@ -40,7 +67,7 @@ class AgendamentoModel {
       WHERE ag.id_cliente = $1
       ORDER BY ag.data_agendada DESC, ag.horario_agendado DESC;
     `;
-    
+
     try {
       const result = await pool.query(query, [idCliente]);
       return result.rows;
@@ -66,7 +93,7 @@ class AgendamentoModel {
       WHERE at.id_profissional = $1
       ORDER BY ag.data_agendada DESC, ag.horario_agendado DESC;
     `;
-    
+
     try {
       const result = await pool.query(query, [idProfissional]);
       return result.rows;
@@ -91,7 +118,7 @@ class AgendamentoModel {
       INNER JOIN usuario u ON at.id_profissional = u.id_usuario
       WHERE ag.id_agendamento = $1;
     `;
-    
+
     try {
       const result = await pool.query(query, [id]);
       return result.rows[0];
@@ -122,15 +149,15 @@ class AgendamentoModel {
            ($3 + (SELECT duracao FROM atividade WHERE id_atividade = ag.id_atividade) * INTERVAL '1 minute') > ag.horario_agendado)
         )
     `;
-    
+
     const values = [idCliente, dataAgendada, horarioAgendado];
-    
+
     // Se for uma atualização, excluir o próprio agendamento da verificação
     if (idAgendamentoAtual) {
       query += ` AND ag.id_agendamento != $4`;
       values.push(idAgendamentoAtual);
     }
-    
+
     try {
       const result = await pool.query(query, values);
       return parseInt(result.rows[0].total) > 0;
@@ -156,14 +183,14 @@ class AgendamentoModel {
       WHERE at.id_atividade = $1
       GROUP BY at.capacidade_max;
     `;
-    
+
     try {
       const result = await pool.query(query, [idAtividade, dataAgendada, horarioAgendado]);
-      
+
       if (result.rows.length === 0) {
         return false; // Atividade não existe
       }
-      
+
       const { capacidade_max, agendamentos_ativos } = result.rows[0];
       return parseInt(agendamentos_ativos) < parseInt(capacidade_max);
     } catch (error) {
@@ -176,16 +203,16 @@ class AgendamentoModel {
    */
   static async update(id, agendamento) {
     const { data_agendada, horario_agendado } = agendamento;
-    
+
     const query = `
       UPDATE agendamento
       SET data_agendada = $1, horario_agendado = $2
       WHERE id_agendamento = $3
       RETURNING *;
     `;
-    
+
     const values = [data_agendada, horario_agendado, id];
-    
+
     try {
       const result = await pool.query(query, values);
       return result.rows[0];
@@ -204,7 +231,7 @@ class AgendamentoModel {
       WHERE id_agendamento = $1
       RETURNING *;
     `;
-    
+
     try {
       const result = await pool.query(query, [id]);
       return result.rows[0];
@@ -223,7 +250,7 @@ class AgendamentoModel {
       FROM agendamento
       WHERE id_agendamento = $1;
     `;
-    
+
     try {
       const result = await pool.query(query, [id]);
       return result.rows[0]?.passou || false;

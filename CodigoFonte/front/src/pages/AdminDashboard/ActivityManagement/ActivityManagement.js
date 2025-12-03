@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../../components/Modal/Modal';
-import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService'; // Importa o serviço
+import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService';
 import './ActivityManagement.css';
 
+/**
+ * Componente da tela "Gerenciamento de Atividades" (Painel do Admin).
+ * Permite ao administrador visualizar, criar, editar e excluir qualquer atividade do sistema.
+ */
 function ActivityManagement() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS ---
-  useEffect(() => {
-    loadData();
-  }, []);
+  const [filterType, setFilterType] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  /**
+   * Carrega a lista completa de atividades.
+   */
   const loadData = async () => {
     try {
       const data = await getAllActivities();
@@ -23,30 +34,27 @@ function ActivityManagement() {
     }
   };
 
-  // Filtros
-  const [filterType, setFilterType] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  // Modais
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  
-  const [selectedActivity, setSelectedActivity] = useState(null);
-
-  // Lógica de Filtro
+  /**
+   * Filtra as atividades por tipo, nome e profissional.
+   */
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
+
     const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      item.name.toLowerCase().includes(searchLower) || 
-      item.professional.toLowerCase().includes(searchLower);
+    const nameSafe = (item.name || '').toLowerCase();
+    const profSafe = (item.professional || '').toLowerCase();
+
+    const matchesSearch = nameSafe.includes(searchLower) || profSafe.includes(searchLower);
+
     return matchesType && matchesSearch;
   });
 
   // --- AÇÕES ---
 
-  // 1. Excluir
   const handleDelete = (activity) => {
     setSelectedActivity(activity);
     setDeleteModalOpen(true);
@@ -54,37 +62,45 @@ function ActivityManagement() {
 
   const confirmDelete = async () => {
     await deleteActivityAdmin(selectedActivity.id);
-    
-    setActivities(activities.filter(a => a.id !== selectedActivity.id));
+    setActivities(prev => prev.filter(a => a.id !== selectedActivity.id));
     setDeleteModalOpen(false);
     alert("Atividade excluída pelo Administrador.");
   };
 
-  // 2. Editar
   const handleEdit = (activity) => {
-    setSelectedActivity({ ...activity });
+    // Prepara o objeto para edição, mantendo o ID do profissional oculto
+    setSelectedActivity({
+      ...activity,
+      professionalId: activity.professionalId || ''
+    });
     setEditModalOpen(true);
   };
 
   const confirmEdit = async (e) => {
     e.preventDefault();
-    
-    const updated = await updateActivityAdmin(selectedActivity);
-    
-    setActivities(activities.map(a => a.id === updated.id ? updated : a));
-    setEditModalOpen(false);
-    alert("Atividade atualizada com sucesso!");
+    try {
+      const updated = await updateActivityAdmin(selectedActivity);
+
+      // Recarrega dados para garantir sincronia total com o backend
+      await loadData();
+
+      setEditModalOpen(false);
+      alert("Atividade atualizada com sucesso!");
+    } catch (error) {
+      // Erro tratado no serviço
+    }
   };
 
-  // 3. Criar
   const handleCreate = async (e) => {
     e.preventDefault();
-    
-    const newActivity = await createActivityAdmin(selectedActivity);
-    
-    setActivities([...activities, newActivity]);
-    setCreateModalOpen(false);
-    alert("Nova atividade cadastrada!");
+    try {
+      await createActivityAdmin(selectedActivity);
+      setCreateModalOpen(false);
+      await loadData();
+      alert("Nova atividade cadastrada com sucesso!");
+    } catch (error) {
+      // Erro tratado no serviço
+    }
   };
 
   const handleChange = (e) => {
@@ -110,9 +126,9 @@ function ActivityManagement() {
 
       <div className="filters-wrapper-admin">
         <div className="search-box">
-          <input 
-            type="text" 
-            placeholder="Buscar por nome ou profissional..." 
+          <input
+            type="text"
+            placeholder="Buscar por nome ou profissional..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -166,18 +182,25 @@ function ActivityManagement() {
           </div>
           <div className="modal-row">
             <div className="modal-form-group">
-              <label>Duração:</label>
-              <input type="text" name="duration" placeholder="Ex: 60 min" required onChange={handleChange} />
+              <label>Duração (min):</label>
+              <input type="number" name="duration" placeholder="Ex: 60" required onChange={handleChange} />
             </div>
             <div className="modal-form-group">
-              <label>Capacidade Máxima:</label>
+              <label>Capacidade:</label>
               <input type="number" name="capacity" required onChange={handleChange} />
             </div>
           </div>
-          {/* Campo de Profissional (Apenas para Admin) */}
+
           <div className="modal-form-group">
-            <label>Profissional Responsável:</label>
-            <input type="text" name="professional" required onChange={handleChange} />
+            <label>ID do Profissional:</label>
+            <input
+              type="number"
+              name="professional"
+              placeholder="Ex: 1, 2, 3..."
+              required
+              onChange={handleChange}
+            />
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Olhe no banco qual o ID de um professor válido.</small>
           </div>
 
           <div className="modal-actions">
@@ -207,7 +230,7 @@ function ActivityManagement() {
           </div>
           <div className="modal-row">
             <div className="modal-form-group">
-              <label>Duração:</label>
+              <label>Duração (min):</label>
               <input type="text" name="duration" defaultValue={selectedActivity?.duration} onChange={handleChange} />
             </div>
             <div className="modal-form-group">
@@ -215,8 +238,18 @@ function ActivityManagement() {
               <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
           </div>
-          
-          {/* Sem Horário e Sem Profissional na Edição */}
+
+          <div className="modal-form-group">
+            <label>ID do Profissional:</label>
+            <input
+              type="number"
+              name="professionalId"
+              defaultValue={selectedActivity?.professionalId}
+              required
+              onChange={handleChange}
+            />
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Você pode transferir a aula para outro professor.</small>
+          </div>
 
           <div className="modal-actions">
             <button type="button" className="btn-cancel-modal" onClick={() => setEditModalOpen(false)}>Cancelar</button>

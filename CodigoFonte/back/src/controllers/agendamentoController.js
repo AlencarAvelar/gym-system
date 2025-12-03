@@ -43,12 +43,19 @@ class AgendamentoController {
   /**
    * [RF007] Consultar agendamentos (AUTENTICADO)
    */
-  static async getAll(req, res) {
+static async getAll(req, res) {
     try {
-      // Usa dados do usuário logado
+      // --- DEBUG: QUEM ESTÁ PEDINDO? ---
+      console.log("🔍 DEBUG Controller getAll:");
+      console.log("   Usuário:", req.user);
+      console.log("   Tipo:", req.user.tipo_usuario);
+
       const { id_usuario, tipo_usuario } = req.user;
 
       const result = await AgendamentoService.getAgendamentos(id_usuario, tipo_usuario);
+      
+      // --- DEBUG: O QUE O SERVIÇO DEVOLVEU? ---
+      console.log("   Resultado do Serviço:", result);
 
       return res.status(200).json(result);
     } catch (error) {

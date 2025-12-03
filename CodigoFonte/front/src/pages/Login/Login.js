@@ -1,50 +1,71 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // <-- Importamos o useNavigate
+import { Link, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/authService';
 import './Login.css';
 
+/**
+ * Componente da página de Login (Home pública).
+ * Apresenta o formulário de autenticação e texto promocional do sistema.
+ */
 function Login() {
-  const navigate = useNavigate(); // Hook para navegação
-
-  // Estados para guardar o que o usuário digita
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); // Estado para mensagem de erro
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Função que roda ao clicar em "Entrar"
-  const handleSubmit = (event) => {
+  /**
+   * Manipula o envio do formulário de login.
+   * Tenta autenticar via serviço e redireciona o usuário conforme seu perfil.
+   */
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+    setLoading(true);
 
-    if (password === '123') {
-      navigate('/dashboard'); // Cliente
-    } else if (password === '456') {
-      navigate('/profissional'); // Profissional
-    } else if (password === 'admin') {
-      navigate('/admin'); // <-- NOVA ROTA: Admin
-    } else {
-      setError('Senhas: "123" (Cliente), "456" (Profissional), "admin" (Admin).');
+    try {
+      const usuario = await authService.login(email, password);
+
+      if (usuario) {
+        const tipo = usuario.tipo_usuario;
+
+        if (tipo === 'Administrador') {
+          navigate('/admin');
+        } else if (tipo === 'Professor' || tipo === 'Personal Trainer') {
+          navigate('/profissional');
+        } else {
+          navigate('/dashboard'); // Cliente
+        }
+      }
+    } catch (msg) {
+      setError(msg || 'Falha no login');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    // 'login-page' agora é nossa "Seção Hero"
     <div className="login-page">
-
-      {/* Novo container para o layout de 2 colunas */}
       <div className="login-content">
 
-        {/* Coluna 1: O "Chamariz" */}
+        {/* Seção Promocional (Hero Text) */}
         <div className="attention-text">
-          <h1>Transforme seu corpo.</h1>
-          <h1>Transforme sua vida.</h1>
-          <p>Acesse seu painel e agende seu próximo treino.</p>
+          <h1>Desperte sua</h1>
+          <h1 className="highlight-text">Melhor Versão.</h1>
+
+          <p>
+            Tecnologia e performance unidas para transformar sua rotina.
+            Gerencie seus horários com facilidade, garanta seu lugar nas melhores aulas
+            e foque no que realmente importa: <strong>seus resultados</strong>.
+          </p>
+
+          <p className="sub-text">O primeiro passo para a mudança começa agora.</p>
         </div>
 
-        {/* Adicionamos o onSubmit aqui no form */}
+        {/* Formulário de Acesso */}
         <form id="login-form" className="login-form" onSubmit={handleSubmit}>
-          <h2>Área do Cliente</h2>
+          <h2>Acesse sua conta</h2>
 
-          {/* Exibe mensagem de erro se houver */}
           {error && <p className="login-error-message">{error}</p>}
 
           <div className="input-group">
@@ -55,7 +76,7 @@ function Login() {
               placeholder="seuemail@exemplo.com"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)} // Atualiza o estado
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -67,18 +88,19 @@ function Login() {
               placeholder="Sua senha"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // Atualiza o estado
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="login-button">Entrar</button>
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
 
           <div className="login-links">
             <Link to="/recuperar-senha">Esqueci minha senha</Link>
           </div>
         </form>
       </div>
-
     </div>
   );
 }

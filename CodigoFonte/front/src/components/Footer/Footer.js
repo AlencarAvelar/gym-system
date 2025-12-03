@@ -1,6 +1,9 @@
 import React from 'react';
 import './Footer.css';
 
+/**
+ * Rodapé global da aplicação.
+ */
 function Footer() {
   return (
     <footer className="main-footer">

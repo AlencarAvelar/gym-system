@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { getAllAppointments } from '../../../services/adminService'; // Importa o serviço
+import { getAllAppointments } from '../../../services/adminService';
 import './ManageAppointments.css';
 
+/**
+ * Componente da tela "Gerenciamento de Agendamentos" (Painel do Admin).
+ * Exibe uma listagem global de todos os agendamentos do sistema, com filtros avançados.
+ */
 function ManageAppointments() {
   const [allAppointments, setAllAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState('');
+
+  /**
+   * Carrega a lista completa de agendamentos do sistema.
+   */
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -21,19 +30,18 @@ function ManageAppointments() {
     loadData();
   }, []);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
-
-  // Lógica de Filtragem Avançada
+  /**
+   * Filtra a lista de agendamentos com base na busca textual e data.
+   * A busca textual verifica: Nome do Cliente, Nome da Atividade e Nome do Profissional.
+   */
   const filteredList = allAppointments.filter(item => {
-    // 1. Filtro de Texto
     const searchLower = searchTerm.toLowerCase();
-    const matchesText = 
+
+    const matchesText =
       item.client.toLowerCase().includes(searchLower) ||
       item.activity.toLowerCase().includes(searchLower) ||
       item.professional.toLowerCase().includes(searchLower);
 
-    // 2. Filtro de Data
     const matchesDate = dateFilter ? item.date === dateFilter : true;
 
     return matchesText && matchesDate;
@@ -47,12 +55,12 @@ function ManageAppointments() {
     <div className="manage-appointments-container">
       <div className="page-header">
         <h1>Gerenciamento de Agendamentos</h1>
-        
+
         <div className="filters-bar">
           <div className="search-box-admin">
-            <input 
-              type="text" 
-              placeholder="Buscar Cliente, Atividade ou Profissional..." 
+            <input
+              type="text"
+              placeholder="Buscar Cliente, Atividade ou Profissional..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -61,12 +69,16 @@ function ManageAppointments() {
 
           <div className="date-filter">
             <label>Data:</label>
-            <input 
-              type="date" 
+            <input
+              type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
             />
-            {dateFilter && <button className="clear-btn" onClick={() => setDateFilter('')}>Limpar</button>}
+            {dateFilter && (
+              <button className="clear-btn" onClick={() => setDateFilter('')}>
+                Limpar
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -94,8 +106,8 @@ function ManageAppointments() {
                   <td>{item.activity}</td>
                   <td>{item.professional}</td>
                   <td>
-                    <span className={`status-badge ${item.status.toLowerCase()}`}>
-                      {item.status}
+                    <span className={`status-badge ${item.status ? item.status.toLowerCase() : 'ativo'}`}>
+                      {item.status || 'Ativo'}
                     </span>
                   </td>
                 </tr>

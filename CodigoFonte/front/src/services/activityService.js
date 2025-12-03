@@ -1,72 +1,72 @@
-// src/services/activityService.js
+import api from './api';
 
-// --- MOCK DATA ---
-const MOCK_ACTIVITIES = [
-  {
-    id: 101,
-    name: "Musculação Livre",
-    type: "Treino",
-    professional: "João Paulo",
-    time: "08:00 - 22:00",
-    vacancies: "Ilimitado"
-  },
-  {
-    id: 102,
-    name: "Pilates Solo",
-    type: "Aula",
-    professional: "Maria Clara",
-    time: "09:00",
-    vacancies: "3/10"
-  },
-  {
-    id: 103,
-    name: "Boxe Funcional",
-    type: "Aula",
-    professional: "Pedro Rocha",
-    time: "19:00",
-    vacancies: "12/20"
-  },
-  {
-    id: 104,
-    name: "Avaliação Física",
-    type: "Treino",
-    professional: "Dra. Fernanda",
-    time: "Agendável",
-    vacancies: "Livre"
-  },
-  {
-    id: 105,
-    name: "Spinning Intenso",
-    type: "Aula",
-    professional: "Roberto Lima",
-    time: "18:30",
-    vacancies: "0/15"
-  },
-  {
-    id: 106,
-    name: "Yoga Relax",
-    type: "Aula",
-    professional: "Maria Clara",
-    time: "07:00",
-    vacancies: "5/10"
-  }
-];
+/**
+ * Módulo de serviços relacionados a Atividades (visão do Cliente).
+ * Responsável por buscar aulas disponíveis e realizar agendamentos.
+ */
 
-// GET: Buscar atividades disponíveis
+/**
+ * Recupera a lista de atividades disponíveis para agendamento.
+ * Filtra e formata os dados vindos do backend para exibição no card do cliente.
+ * * @returns {Promise<Array>} Lista de atividades formatada com status de vagas.
+ */
 export const getAvailableActivities = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...MOCK_ACTIVITIES]);
-    }, 300);
-  });
+  try {
+    const response = await api.get('/atividades/disponiveis');
+
+    // Garante que a resposta seja tratada como array
+    const lista = response.data.data || [];
+
+    return lista.map(item => {
+      const total = parseInt(item.capacidade_max || 0);
+      const disponiveis = parseInt(item.vagas_disponiveis || 0);
+
+      // Calcula o número de vagas ocupadas para exibição "Ocupadas/Total"
+      const ocupadas = total - disponiveis;
+
+      // Define se a atividade está lotada (sem vagas livres)
+      const isFull = disponiveis <= 0;
+
+      return {
+        id: item.id_atividade,
+        name: item.nome_atividade,
+        type: item.tipo_atividade,
+        professional: item.nome_profissional || "Instrutor",
+
+        // Formatação visual
+        time: item.duracao ? `${item.duracao} min` : "-",
+        vacancies: `${ocupadas}/${total}`,
+
+        // Flag booleana para controle de UI (botão desabilitado)
+        isFull: isFull
+      };
+    });
+  } catch (error) {
+    console.error("Erro ao buscar atividades:", error);
+    return [];
+  }
 };
 
-// POST: Criar um agendamento (Simulação)
+/**
+ * Realiza o agendamento de uma atividade para o cliente logado.
+ * * @param {number|string} activityId - ID da atividade.
+ * @param {string} date - Data do agendamento (YYYY-MM-DD).
+ * @param {string} time - Horário do agendamento (HH:MM).
+ * @returns {Promise<Object>} Dados do agendamento criado.
+ * @throws {string} Mensagem de erro em caso de falha (ex: conflito, sem vaga).
+ */
 export const createSchedule = async (activityId, date, time) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log(`[API] Agendamento criado: Atividade ${activityId} em ${date} às ${time}`);
-      resolve({ success: true });
-    }, 500);
-  });
+  try {
+    const payload = {
+      id_atividade: activityId,
+      data_agendada: date,
+      horario_agendado: time
+    };
+
+    const response = await api.post('/agendamentos', payload);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao criar agendamento:", error);
+    throw error.response?.data?.message || "Erro ao realizar agendamento.";
+  }
 };

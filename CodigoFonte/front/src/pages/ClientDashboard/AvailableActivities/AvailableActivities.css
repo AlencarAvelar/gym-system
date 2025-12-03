@@ -1,25 +1,29 @@
-/* Container principal da página */
+/* =========================================
+   ESTILOS DE "ATIVIDADES DISPONÍVEIS"
+   ========================================= */
+
 .activities-container {
   width: 100%;
+  animation: fadeIn 0.3s ease-out;
 }
 
-/* Cabeçalho da página (Título + Filtros) */
+/* --- Cabeçalho e Filtros --- */
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+  flex-wrap: wrap;
   gap: 1.5rem;
 }
 
 .page-header h1 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-dark);
   margin: 0;
 }
 
-/* --- Wrapper dos Filtros (Busca + Botões) --- */
+/* Wrapper para agrupar Busca + Botões */
 .filters-wrapper {
   display: flex;
   gap: 1rem;
@@ -32,40 +36,43 @@
   position: relative;
   display: flex;
   align-items: center;
-  width: 300px; /* Largura fixa para a busca */
+  width: 300px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 0.6rem 2.5rem 0.6rem 1rem; /* Espaço extra na direita para o ícone */
-  border: 1px solid #ddd;
-  border-radius: 25px; /* Borda bem redonda (Pill shape) */
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 25px;
+  /* Borda redonda (Pill) */
   font-size: 0.9rem;
   outline: none;
   transition: all 0.2s;
-  background-color: white;
+  background-color: #ffffff;
+  color: var(--text-dark);
 }
 
 .search-box input:focus {
-  border-color: #007bff;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
 .search-icon {
   position: absolute;
   right: 12px;
-  color: #888;
+  color: var(--text-muted);
   font-size: 0.9rem;
-  pointer-events: none; /* O clique atravessa o ícone */
+  pointer-events: none;
 }
 
-/* --- Botões de Filtro (Tipo) --- */
+/* --- Botões de Filtro (Tabs) --- */
 .filter-controls {
   display: flex;
-  background: #f1f3f5; /* Fundo cinza suave atrás do grupo */
+  background: #e9ecef;
+  /* Fundo mais escuro para destacar os botões brancos */
   padding: 0.25rem;
-  border-radius: 25px; /* Combina com a busca */
-  border: 1px solid #eee;
+  border-radius: 25px;
+  border: 1px solid var(--border-color);
 }
 
 .filter-btn {
@@ -74,39 +81,36 @@
   padding: 0.4rem 1.2rem;
   border-radius: 20px;
   cursor: pointer;
-  color: #666;
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 
 .filter-btn:hover {
-  color: #333;
-  background-color: rgba(0,0,0,0.05);
+  color: var(--text-dark);
 }
 
 .filter-btn.active {
-  background-color: #fff;
-  background: #fff;
-  color: #007bff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  background: #ffffff;
+  color: var(--color-primary);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 /* --- Grid de Cards --- */
 .activities-grid {
   display: grid;
-  /* Responsivo: Colunas automáticas com largura mínima de 280px */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
 
 /* O Card Individual */
 .activity-card {
-  background: white;
+  background: #ffffff;
   border-radius: 10px;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -115,7 +119,7 @@
 
 .activity-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Header do Card */
@@ -135,43 +139,54 @@
   letter-spacing: 0.5px;
 }
 
-.tag.treino { background-color: #e3f2fd; color: #1976d2; }
-.tag.aula { background-color: #f3e5f5; color: #7b1fa2; }
+.tag.treino {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
 
-.vacancies-info { 
-  color: #666; 
-  font-size: 0.85rem; 
-  font-weight: 500; 
+.tag.aula {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.vacancies-info {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 /* Corpo do Card */
-.card-body h3 { 
-  margin: 0; 
-  font-size: 1.2rem; 
-  color: #222; 
+.card-body h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-dark);
   line-height: 1.3;
 }
 
-.professional { 
-  color: #666; 
-  margin: 0.3rem 0 1rem 0; 
-  font-size: 0.9rem; 
+.professional {
+  color: var(--text-muted);
+  margin: 0.3rem 0 1rem 0;
+  font-size: 0.9rem;
 }
 
 .time-badge {
-  background-color: #fafafa;
-  border: 1px solid #eee;
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
   padding: 0.6rem;
   border-radius: 6px;
   text-align: center;
   font-weight: 600;
-  color: #444;
+  color: var(--text-dark);
   font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-/* Ações (Botão de Agendar) */
-.card-actions { 
-  margin-top: auto; /* Empurra para o fundo */
+/* --- Ações --- */
+.card-actions {
+  margin-top: auto;
 }
 
 .btn-schedule {
@@ -179,34 +194,63 @@
   padding: 0.8rem;
   border: none;
   border-radius: 6px;
-  background-color: #28a745; /* Verde sucesso */
-  color: white;
+  background-color: var(--color-success);
+  /* Verde Sucesso */
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.btn-schedule:hover { 
-  background-color: #218838; 
+.btn-schedule:hover:not(:disabled) {
+  background-color: #218838;
+  /* Verde mais escuro */
 }
 
-/* Estado de Lotado/Desabilitado */
 .btn-schedule:disabled {
   background-color: #e0e0e0;
-  color: #888;
+  color: #999;
   cursor: not-allowed;
 }
 
 /* Mensagem de "Sem Resultados" */
 .no-results {
-  grid-column: 1 / -1; /* Ocupa a linha inteira do grid */
+  grid-column: 1 / -1;
   text-align: center;
-  background-color: #f8f9fa;
+  background-color: var(--bg-light);
   padding: 3rem;
   border-radius: 10px;
-  color: #666;
+  color: var(--text-muted);
   font-size: 1.1rem;
   font-style: italic;
-  border: 2px dashed #dee2e6;
+  border: 2px dashed var(--border-color);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-box,
+  .filter-controls {
+    width: 100%;
+  }
+
+  .filter-controls {
+    justify-content: space-between;
+  }
+
+  .filter-btn {
+    flex: 1;
+    padding: 0.5rem;
+    text-align: center;
+  }
 }

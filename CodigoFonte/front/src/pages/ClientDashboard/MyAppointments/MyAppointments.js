@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../../../components/Modal/Modal';
-import { getMyAppointments, deleteAppointment, updateAppointment } from '../../../services/appointmentService'; // Importa o serviço
+import { getMyAppointments, deleteAppointment, updateAppointment } from '../../../services/appointmentService';
 import './MyAppointments.css';
 
+/**
+ * Componente da tela "Meus Agendamentos" (Painel do Cliente).
+ * Lista os agendamentos do usuário e permite editar ou cancelar.
+ */
 function MyAppointments() {
-  const [appointments, setAppointments] = useState([]); // Começa vazio
-  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS (GET) ---
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const data = await getMyAppointments();
-      setAppointments(data);
-    } catch (error) {
-      console.error("Erro ao carregar agendamentos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // --- ESTADOS DOS MODAIS ---
+  // Estados de controle dos Modais
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // --- AÇÕES (DELETE) ---
+  /**
+   * Carrega a lista de agendamentos ao montar o componente.
+   */
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const data = await getMyAppointments();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Erro ao carregar agendamentos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  // --- GERENCIAMENTO DE EXCLUSÃO ---
+
   const handleOpenDelete = (item) => {
     setSelectedAppointment(item);
     setDeleteModalOpen(true);
@@ -37,41 +43,47 @@ function MyAppointments() {
 
   const handleConfirmDelete = async () => {
     if (!selectedAppointment) return;
-    
-    // Chama o serviço para deletar
-    await deleteAppointment(selectedAppointment.id);
-    
-    // Atualiza a lista localmente (ou recarrega tudo com loadData())
-    setAppointments(appointments.filter(a => a.id !== selectedAppointment.id));
-    
-    setDeleteModalOpen(false);
-    setSelectedAppointment(null);
-    alert("Agendamento excluído com sucesso!");
+
+    try {
+      await deleteAppointment(selectedAppointment.id);
+
+      // Atualiza o estado local removendo o item excluído
+      setAppointments(prev => prev.filter(a => a.id !== selectedAppointment.id));
+
+      setDeleteModalOpen(false);
+      setSelectedAppointment(null);
+      alert("Agendamento excluído com sucesso!");
+    } catch (error) {
+      // O erro já é tratado/alertado no serviço, mas podemos logar aqui se necessário
+    }
   };
 
-  // --- AÇÕES (UPDATE) ---
+  // --- GERENCIAMENTO DE EDIÇÃO ---
+
   const handleOpenEdit = (item) => {
-    setSelectedAppointment({ ...item }); // Cria uma cópia para edição
+    setSelectedAppointment({ ...item }); // Cria cópia para evitar mutação direta
     setEditModalOpen(true);
   };
 
   const handleConfirmEdit = async (e) => {
     e.preventDefault();
-    
-    // Chama o serviço para atualizar
-    await updateAppointment(selectedAppointment);
 
-    // Atualiza a lista localmente
-    setAppointments(appointments.map(a => 
-      a.id === selectedAppointment.id ? selectedAppointment : a
-    ));
+    try {
+      await updateAppointment(selectedAppointment);
 
-    setEditModalOpen(false);
-    setSelectedAppointment(null);
-    alert("Agendamento atualizado!");
+      // Atualiza o estado local com os novos dados
+      setAppointments(prev => prev.map(a =>
+        a.id === selectedAppointment.id ? selectedAppointment : a
+      ));
+
+      setEditModalOpen(false);
+      setSelectedAppointment(null);
+      alert("Agendamento atualizado com sucesso!");
+    } catch (error) {
+      // Erro tratado no serviço
+    }
   };
 
-  // --- RENDERIZAÇÃO ---
   if (loading) {
     return <div className="appointments-container"><p>Carregando seus agendamentos...</p></div>;
   }
@@ -87,7 +99,7 @@ function MyAppointments() {
           appointments.map((item) => (
             <div key={item.id} className="appointment-card">
               <div className="card-header">
-                <span className={`tag ${item.type.toLowerCase()}`}>{item.type}</span>
+                <span className={`tag ${item.type ? item.type.toLowerCase() : 'treino'}`}>{item.type}</span>
                 <span className="vacancies-info">Vagas: {item.vacancies}</span>
               </div>
               <div className="card-body">
@@ -105,13 +117,13 @@ function MyAppointments() {
             </div>
           ))
         ) : (
-          <p>Você ainda não tem agendamentos.</p>
+          <p>Você ainda não possui agendamentos.</p>
         )}
       </div>
 
-      {/* --- MODAL DE EXCLUSÃO --- */}
-      <Modal 
-        isOpen={isDeleteModalOpen} 
+      {/* Modal de Confirmação de Exclusão */}
+      <Modal
+        isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         title="Confirmar Exclusão"
       >
@@ -122,27 +134,29 @@ function MyAppointments() {
         </div>
       </Modal>
 
-      {/* --- MODAL DE EDIÇÃO --- */}
-      <Modal 
-        isOpen={isEditModalOpen} 
+      {/* Modal de Edição */}
+      <Modal
+        isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         title="Editar Agendamento"
       >
         <form onSubmit={handleConfirmEdit}>
           <div className="modal-form-group">
             <label>Nova Data:</label>
-            <input 
-              type="text" 
-              defaultValue={selectedAppointment?.date} 
-              onChange={(e) => setSelectedAppointment({...selectedAppointment, date: e.target.value})}
+            <input
+              type="date"
+              required
+              defaultValue={selectedAppointment?.date}
+              onChange={(e) => setSelectedAppointment({ ...selectedAppointment, date: e.target.value })}
             />
           </div>
           <div className="modal-form-group">
             <label>Novo Horário:</label>
-            <input 
-              type="text" 
+            <input
+              type="time"
+              required
               defaultValue={selectedAppointment?.time}
-              onChange={(e) => setSelectedAppointment({...selectedAppointment, time: e.target.value})}
+              onChange={(e) => setSelectedAppointment({ ...selectedAppointment, time: e.target.value })}
             />
           </div>
           <div className="modal-actions">

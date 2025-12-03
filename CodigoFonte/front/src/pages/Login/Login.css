@@ -1,20 +1,24 @@
-/* O container "Hero" (100% da altura da tela) */
+/* =========================================
+   ESTILOS DA PÁGINA DE LOGIN
+   ========================================= */
+
+/* Container "Hero" (100% da altura da tela) */
 .login-page {
   width: 100%;
-  height: 100vh; /* Ocupa a primeira "dobra" inteira */
-  
-  /* Mantém o fundo que gostamos */
+  height: 100vh;
+
+  /* Imagem de fundo */
   background-image: url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1920&q=80');
   background-size: cover;
   background-position: center;
 
-  /* Centraliza o conteúdo (o layout de 2 colunas) */
+  /* Centraliza o conteúdo */
   display: flex;
-  align-items: center; /* Centraliza verticalmente */
-  padding: 0 5%; /* 5% de margem nas laterais */
+  align-items: center;
+  padding: 0 5%;
   box-sizing: border-box;
 
-  /* Mantém o filtro escuro */
+  /* Filtro escuro sobre a imagem */
   position: relative;
   isolation: isolate;
 }
@@ -31,70 +35,92 @@
 /* O container do layout (Grid de 2 colunas) */
 .login-content {
   width: 100%;
-  max-width: 1100px; /* Limita a largura do conteúdo */
-  margin: 0 auto; /* Centraliza o grid */
+  max-width: 1100px;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: 2fr 1fr; /* Coluna 1 (texto) é 2x maior que a Coluna 2 (form) */
+  grid-template-columns: 2fr 1fr;
+  /* Texto ocupa 2/3, Form ocupa 1/3 */
   align-items: center;
-  gap: 3rem; /* Espaço entre as colunas */
+  gap: 4rem;
 }
 
-/* Coluna 1: O "Chamariz" */
+/* --- Seção de Texto Promocional --- */
 .attention-text {
-  color: #fff;
+  color: var(--text-light);
 }
 
 .attention-text h1 {
-  font-size: 3.5rem; /* Texto grande */
+  font-size: 3.5rem;
   font-weight: 800;
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  text-transform: uppercase;
 }
 
-.attention-text h1:nth-child(2) {
-  color: #007bff; /* Destaque no segundo H1 */
+/* Texto com Gradiente */
+.highlight-text {
+  background: linear-gradient(90deg, var(--color-primary), #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  /* Sombra sutil para destacar do fundo */
+  filter: drop-shadow(0px 2px 10px rgba(0, 123, 255, 0.3));
 }
 
 .attention-text p {
-  font-size: 1.25rem;
-  color: #f0f0f0;
-  max-width: 500px; /* Limita a largura do parágrafo */
+  font-size: 1.2rem;
+  color: #e0e0e0;
+  max-width: 480px;
+  margin-top: 1.5rem;
+  line-height: 1.6;
+  font-weight: 300;
 }
 
-/* Coluna 2: O Formulário (igual ao que fizemos, mas agora no canto) */
+.attention-text strong {
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.sub-text {
+  font-size: 0.9rem !important;
+  color: #aaa !important;
+  margin-top: 1.5rem !important;
+  font-style: italic;
+  border-left: 3px solid var(--color-primary);
+  padding-left: 15px;
+}
+
+/* --- Formulário de Login --- */
 .login-form {
   padding: 2.5rem 2rem;
   width: 100%;
-  
-  /* O mesmo efeito de vidro */
-  background: rgba(20, 20, 20, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* Efeito Vidro Fosco (Glassmorphism) */
+  background: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  
-  /* Faz ele ficar na segunda coluna do grid */
-  grid-column: 2 / 3;
+  gap: 1.5rem;
 }
-
-
-/* --- O RESTANTE DO CSS (Estilização do formulário) --- */
-/* (Isso é o mesmo que já tínhamos, apenas garantindo) */
 
 .login-form h2 {
   margin: 0;
-  color: #ffffff;
+  color: var(--text-light);
   text-align: center;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
+/* Campos de Entrada */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -102,63 +128,109 @@
 }
 
 .input-group label {
-  color: #f0f0f0;
+  color: #ccc;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
 .input-group input {
   padding: 0.8rem;
-  border: 1px solid #555;
-  border-radius: 5px;
+  border: 1px solid #444;
+  border-radius: 6px;
   background: #333;
-  color: #ffffff;
+  color: var(--text-light);
   font-size: 1rem;
+  transition: all 0.2s;
 }
 
+.input-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  background: #2b2b2b;
+}
+
+/* Botão Principal */
 .login-button {
-  padding: 0.8rem;
+  padding: 0.9rem;
   border: none;
-  border-radius: 5px;
-  background-color: #007bff; /* Cor de destaque */
-  color: white;
+  border-radius: 6px;
+  background-color: var(--color-primary);
+  color: var(--text-light);
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.1s;
+  margin-top: 0.5rem;
 }
 
 .login-button:hover {
-  background-color: #0056b3;
+  background-color: var(--color-primary-dark);
 }
 
+.login-button:active {
+  transform: scale(0.98);
+}
+
+.login-button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Links (Esqueci senha) */
 .login-links {
   text-align: center;
 }
 
 .login-links a {
-  color: #007bff;
+  color: var(--color-primary);
   text-decoration: none;
   font-size: 0.9rem;
+  transition: color 0.2s;
 }
 
 .login-links a:hover {
   text-decoration: underline;
+  color: #66b2ff;
 }
 
-#login-form {
-  scroll-margin-top: 6rem; /* 6rem = 96px (ajuste se precisar) */
-}
-
-/* Mensagem de erro dentro do formulário */
+/* Mensagem de Erro */
 .login-error-message {
-  background-color: #ffcccc; /* Fundo vermelho claro */
-  color: #a00; /* Texto vermelho escuro */
-  border: 1px solid #a00;
-  padding: 0.75rem;
-  border-radius: 5px;
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 0.8rem;
+  border-radius: 6px;
   text-align: center;
   font-size: 0.9rem;
-  font-weight: 600;
-  width: 100%; /* Ocupa a largura toda do form */
-  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+  font-weight: 500;
+}
+
+/* --- Responsividade --- */
+@media (max-width: 900px) {
+  .login-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .login-form {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .attention-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .attention-text p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sub-text {
+    display: inline-block;
+    text-align: left;
+  }
 }

@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createOfferedActivity } from '../../../services/professionalService';
 import './ActivityForm.css';
 
+/**
+ * Componente de formulário para criação de novas atividades pelo Profissional.
+ */
 function ActivityForm() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  // Estados do Formulário
   const [formData, setFormData] = useState({
     name: '',
-    type: 'Aula', // Valor padrão
+    type: 'Aula',
     description: '',
     duration: '',
     capacity: ''
   });
 
-  // Atualiza o estado quando o usuário digita
+  /**
+   * Atualiza o estado do formulário conforme o usuário digita.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -23,16 +29,25 @@ function ActivityForm() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  /**
+   * Envia os dados para criação da atividade.
+   */
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Simulação de envio para o Back-End
-    console.log('Dados da Nova Atividade:', formData);
-    
-    alert(`Atividade "${formData.name}" cadastrada com sucesso!`);
-    
-    // Redireciona de volta para a lista de atividades
-    navigate('/profissional');
+    setLoading(true);
+
+    try {
+      await createOfferedActivity(formData);
+
+      alert(`Atividade "${formData.name}" cadastrada com sucesso!`);
+
+      // Redireciona para a listagem após sucesso
+      navigate('/profissional');
+    } catch (error) {
+      alert(`Erro: ${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,17 +58,16 @@ function ActivityForm() {
       </div>
 
       <form className="activity-form" onSubmit={handleSubmit}>
-        
-        {/* Grupo: Nome e Tipo */}
+
         <div className="form-row">
           <div className="form-group flex-2">
             <label htmlFor="name">Nome da Atividade *</label>
-            <input 
-              type="text" 
-              id="name" 
-              name="name" 
-              placeholder="Ex: Yoga Matinal, Musculação A..." 
-              required 
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Ex: Yoga Matinal..."
+              required
               value={formData.name}
               onChange={handleChange}
             />
@@ -61,10 +75,10 @@ function ActivityForm() {
 
           <div className="form-group flex-1">
             <label htmlFor="type">Tipo *</label>
-            <select 
-              id="type" 
-              name="type" 
-              value={formData.type} 
+            <select
+              id="type"
+              name="type"
+              value={formData.type}
               onChange={handleChange}
             >
               <option value="Aula">Aula (Em grupo)</option>
@@ -73,29 +87,27 @@ function ActivityForm() {
           </div>
         </div>
 
-        {/* Descrição */}
         <div className="form-group">
           <label htmlFor="description">Descrição Detalhada</label>
-          <textarea 
-            id="description" 
-            name="description" 
-            rows="4" 
-            placeholder="Descreva o que será feito, nível de dificuldade, equipamentos necessários..."
+          <textarea
+            id="description"
+            name="description"
+            rows="4"
+            placeholder="Descreva o treino..."
             value={formData.description}
             onChange={handleChange}
           ></textarea>
         </div>
 
-        {/* Grupo: Duração e Capacidade */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="duration">Duração (em minutos) *</label>
-            <input 
-              type="number" 
-              id="duration" 
-              name="duration" 
-              placeholder="Ex: 60" 
-              required 
+            <label htmlFor="duration">Duração (minutos) *</label>
+            <input
+              type="number"
+              id="duration"
+              name="duration"
+              placeholder="60"
+              required
               min="10"
               value={formData.duration}
               onChange={handleChange}
@@ -104,12 +116,12 @@ function ActivityForm() {
 
           <div className="form-group">
             <label htmlFor="capacity">Capacidade Máxima *</label>
-            <input 
-              type="number" 
-              id="capacity" 
-              name="capacity" 
-              placeholder="Ex: 20" 
-              required 
+            <input
+              type="number"
+              id="capacity"
+              name="capacity"
+              placeholder="20"
+              required
               min="1"
               value={formData.capacity}
               onChange={handleChange}
@@ -117,13 +129,12 @@ function ActivityForm() {
           </div>
         </div>
 
-        {/* Botões de Ação */}
         <div className="form-actions">
           <button type="button" className="btn-cancel-form" onClick={() => navigate('/profissional')}>
             Cancelar
           </button>
-          <button type="submit" className="btn-submit-form">
-            Confirmar Cadastro
+          <button type="submit" className="btn-submit-form" disabled={loading}>
+            {loading ? 'Salvando...' : 'Confirmar Cadastro'}
           </button>
         </div>
 
