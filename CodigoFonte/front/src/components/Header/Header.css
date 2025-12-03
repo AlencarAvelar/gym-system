@@ -1,65 +1,103 @@
-/* O cabeçalho fixo */
-.main-header {
-  /* Efeito de vidro, igual ao login */
-  background: rgba(20, 20, 20, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+/* =========================================
+   ESTILOS DO CABEÇALHO (Global)
+   ========================================= */
 
-  width: 100%;
-  padding: 1rem 5%; /* 5% de margem nas laterais */
-  
-  /* Para ficar fixo no topo */
+.main-header {
+  /* Fixação no topo */
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
+  height: var(--header-height);
 
-  /* Para alinhar o logo e a navegação */
+  /* Layout Flexbox */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-sizing: border-box; /* Garante que o padding não estoure a largura */
+
+  /* Espaçamento e Borda */
+  padding: 0 5%;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Efeito de Vidro (Glassmorphism) */
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.3s ease;
 }
 
-/* O logo */
+/* --- Logotipo --- */
 .logo {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 800;
+  color: var(--text-light);
+  letter-spacing: -0.5px;
+  user-select: none;
+  /* Impede seleção de texto */
 }
 
 .logo span {
-  color: #007bff; /* Nossa cor de destaque */
+  color: var(--color-primary);
+  /* Azul do tema */
 }
 
-/* A navegação */
+/* --- Navegação --- */
 .main-nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   align-items: center;
+  /* Centraliza verticalmente */
 }
 
 .main-nav a {
-  color: #f0f0f0;
+  color: #e0e0e0;
+  /* Cinza muito claro para texto secundário */
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.2s;
+  font-size: 0.95rem;
+  transition: color 0.2s ease, transform 0.1s;
 }
 
 .main-nav a:hover {
-  color: #007bff; /* Destaque no hover */
+  color: var(--color-primary);
 }
 
-/* Botão de destaque (para o login, no futuro) */
+/* Botão de Destaque (CTA) */
 .main-nav a.nav-highlight {
-  background-color: #007bff;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  transition: background-color 0.2s;
+  background-color: var(--color-primary);
+  color: var(--text-light);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  /* Mais arredondado (Pill shape) */
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
 }
 
 .main-nav a.nav-highlight:hover {
-  background-color: #0056b3;
-  color: #fff;
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* --- Responsividade (Mobile) --- */
+@media (max-width: 768px) {
+  .main-header {
+    padding: 0 1.5rem;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .main-nav {
+    gap: 1rem;
+  }
+
+  .main-nav a {
+    font-size: 0.85rem;
+  }
+
+  .main-nav a.nav-highlight {
+    padding: 0.4rem 0.9rem;
+  }
 }

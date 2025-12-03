@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { getEnrolledStudents } from '../../../services/professionalService'; // Importa do serviço
+import { getEnrolledStudents } from '../../../services/professionalService';
 import './EnrolledStudents.css';
 
+/**
+ * Componente de consulta de alunos inscritos (Painel do Profissional).
+ * Exibe uma tabela com a lista de presença das aulas ministradas pelo usuário.
+ */
 function EnrolledStudents() {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // --- CARREGAR DADOS ---
+  /**
+   * Carrega a lista de inscritos ao montar o componente.
+   */
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -22,7 +28,10 @@ function EnrolledStudents() {
     loadData();
   }, []);
 
-  // Lógica de Filtragem
+  /**
+   * Filtra a lista de inscritos com base na busca textual.
+   * Permite buscar por nome do aluno, nome da atividade ou data.
+   */
   const filteredEnrollments = enrollments.filter(item => {
     const searchLower = searchTerm.toLowerCase();
     return (
@@ -40,11 +49,11 @@ function EnrolledStudents() {
     <div className="enrolled-container">
       <div className="page-header">
         <h1>Consultar Inscritos</h1>
-        
+
         <div className="search-box">
-          <input 
-            type="text" 
-            placeholder="Buscar por aluno, atividade ou data..." 
+          <input
+            type="text"
+            placeholder="Buscar por aluno, atividade ou data..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

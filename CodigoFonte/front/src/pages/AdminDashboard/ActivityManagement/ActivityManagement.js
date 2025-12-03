@@ -3,15 +3,26 @@ import Modal from '../../../components/Modal/Modal';
 import { getAllActivities, deleteActivityAdmin, updateActivityAdmin, createActivityAdmin } from '../../../services/adminService';
 import './ActivityManagement.css';
 
+/**
+ * Componente da tela "Gerenciamento de Atividades" (Painel do Admin).
+ * Permite ao administrador visualizar, criar, editar e excluir qualquer atividade do sistema.
+ */
 function ActivityManagement() {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS ---
-  useEffect(() => {
-    loadData();
-  }, []);
+  const [filterType, setFilterType] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  /**
+   * Carrega a lista completa de atividades.
+   */
   const loadData = async () => {
     try {
       const data = await getAllActivities();
@@ -23,22 +34,22 @@ function ActivityManagement() {
     }
   };
 
-  const [filterType, setFilterType] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
-  
-  const [selectedActivity, setSelectedActivity] = useState(null);
-
-  // Filtro Blindado
+  /**
+   * Filtra as atividades por tipo, nome e profissional.
+   */
   const filteredActivities = activities.filter(item => {
     const matchesType = filterType === 'Todos' || item.type === filterType;
+
     const searchLower = searchTerm.toLowerCase();
     const nameSafe = (item.name || '').toLowerCase();
     const profSafe = (item.professional || '').toLowerCase();
+
     const matchesSearch = nameSafe.includes(searchLower) || profSafe.includes(searchLower);
+
     return matchesType && matchesSearch;
   });
 
@@ -51,17 +62,16 @@ function ActivityManagement() {
 
   const confirmDelete = async () => {
     await deleteActivityAdmin(selectedActivity.id);
-    setActivities(activities.filter(a => a.id !== selectedActivity.id));
+    setActivities(prev => prev.filter(a => a.id !== selectedActivity.id));
     setDeleteModalOpen(false);
     alert("Atividade excluída pelo Administrador.");
   };
 
   const handleEdit = (activity) => {
-    // Clona e garante que professionalId exista (usando o id oculto que guardamos no service)
-    setSelectedActivity({ 
-        ...activity,
-        // Garante que o input de número receba o valor correto
-        professionalId: activity.professionalId || '' 
+    // Prepara o objeto para edição, mantendo o ID do profissional oculto
+    setSelectedActivity({
+      ...activity,
+      professionalId: activity.professionalId || ''
     });
     setEditModalOpen(true);
   };
@@ -69,15 +79,15 @@ function ActivityManagement() {
   const confirmEdit = async (e) => {
     e.preventDefault();
     try {
-        const updated = await updateActivityAdmin(selectedActivity);
-        
-        // Atualiza a lista visualmente
-        await loadData(); // Recarrega para garantir consistência
-        
-        setEditModalOpen(false);
-        alert("Atividade atualizada com sucesso!");
+      const updated = await updateActivityAdmin(selectedActivity);
+
+      // Recarrega dados para garantir sincronia total com o backend
+      await loadData();
+
+      setEditModalOpen(false);
+      alert("Atividade atualizada com sucesso!");
     } catch (error) {
-        // Erro já tratado no service com alert
+      // Erro tratado no serviço
     }
   };
 
@@ -86,14 +96,13 @@ function ActivityManagement() {
     try {
       await createActivityAdmin(selectedActivity);
       setCreateModalOpen(false);
-      await loadData(); // Recarrega tudo
+      await loadData();
       alert("Nova atividade cadastrada com sucesso!");
     } catch (error) {
-      // Erro tratado no service
+      // Erro tratado no serviço
     }
   };
 
-  // Handler genérico para inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setSelectedActivity(prev => ({ ...prev, [name]: value }));
@@ -117,9 +126,9 @@ function ActivityManagement() {
 
       <div className="filters-wrapper-admin">
         <div className="search-box">
-          <input 
-            type="text" 
-            placeholder="Buscar por nome ou profissional..." 
+          <input
+            type="text"
+            placeholder="Buscar por nome ou profissional..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -181,18 +190,17 @@ function ActivityManagement() {
               <input type="number" name="capacity" required onChange={handleChange} />
             </div>
           </div>
-          
-          {/* CAMPO DE PROFISSIONAL (CRIAÇÃO) */}
+
           <div className="modal-form-group">
             <label>ID do Profissional:</label>
-            <input 
-              type="number" 
-              name="professional" // Mapeado no service para id_profissional
-              placeholder="Ex: 1, 2, 3..." 
-              required 
-              onChange={handleChange} 
+            <input
+              type="number"
+              name="professional"
+              placeholder="Ex: 1, 2, 3..."
+              required
+              onChange={handleChange}
             />
-            <small style={{color: '#666', fontSize: '0.8rem'}}>Olhe no banco qual o ID de um professor válido.</small>
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Olhe no banco qual o ID de um professor válido.</small>
           </div>
 
           <div className="modal-actions">
@@ -230,18 +238,17 @@ function ActivityManagement() {
               <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
           </div>
-          
-          {/* CAMPO DE PROFISSIONAL (EDIÇÃO - ADICIONADO) */}
+
           <div className="modal-form-group">
             <label>ID do Profissional:</label>
-            <input 
-              type="number" 
-              name="professionalId" // Mapeado no service
-              defaultValue={selectedActivity?.professionalId} 
+            <input
+              type="number"
+              name="professionalId"
+              defaultValue={selectedActivity?.professionalId}
               required
-              onChange={handleChange} 
+              onChange={handleChange}
             />
-            <small style={{color: '#666', fontSize: '0.8rem'}}>Você pode transferir a aula para outro professor.</small>
+            <small style={{ color: '#666', fontSize: '0.8rem' }}>Você pode transferir a aula para outro professor.</small>
           </div>
 
           <div className="modal-actions">
@@ -251,7 +258,7 @@ function ActivityManagement() {
         </form>
       </Modal>
 
-      {/* Modal Exclusão (Mantido igual) */}
+      {/* Modal Exclusão */}
       <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Excluir Atividade">
         <p>Tem certeza que deseja excluir <strong>{selectedActivity?.name}</strong>?</p>
         <div className="modal-actions">

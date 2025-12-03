@@ -3,15 +3,25 @@ import Modal from '../../../components/Modal/Modal';
 import { getMyOfferedActivities, deleteOfferedActivity, updateOfferedActivity } from '../../../services/professionalService';
 import './MyOfferedActivities.css';
 
+/**
+ * Componente da tela "Minhas Atividades" (Painel do Profissional).
+ * Permite ao professor visualizar, editar e excluir suas próprias aulas/treinos.
+ */
 function MyOfferedActivities() {
   const [myActivities, setMyActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // --- CARREGAR DADOS ---
-  useEffect(() => {
-    loadData();
-  }, []);
+  const [filterType, setFilterType] = useState('Todos');
+  const [searchTerm, setSearchTerm] = useState('');
 
+  // Estados dos Modais
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
+  /**
+   * Carrega a lista de atividades ministradas pelo profissional logado.
+   */
   const loadData = async () => {
     try {
       const data = await getMyOfferedActivities();
@@ -23,21 +33,21 @@ function MyOfferedActivities() {
     }
   };
 
-  const [filterType, setFilterType] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectedActivity, setSelectedActivity] = useState(null);
+  useEffect(() => {
+    loadData();
+  }, []);
 
+  /**
+   * Filtra as atividades por tipo e nome.
+   */
   const filteredActivities = myActivities.filter(activity => {
     const matchesType = filterType === 'Todos' || activity.type === filterType;
     const matchesSearch = activity.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesType && matchesSearch;
   });
 
-  // --- AÇÕES ---
-  
+  // --- GERENCIAMENTO DE EXCLUSÃO ---
+
   const handleDelete = (activity) => {
     setSelectedActivity(activity);
     setDeleteModalOpen(true);
@@ -46,39 +56,38 @@ function MyOfferedActivities() {
   const confirmDelete = async () => {
     try {
       await deleteOfferedActivity(selectedActivity.id);
-      
-      // Atualiza lista local
-      setMyActivities(myActivities.filter(a => a.id !== selectedActivity.id));
+
+      // Atualiza a lista localmente removendo o item excluído
+      setMyActivities(prev => prev.filter(a => a.id !== selectedActivity.id));
       setDeleteModalOpen(false);
       alert("Atividade excluída com sucesso!");
     } catch (msg) {
-      alert(`Erro: ${msg}`); // Mostra erro do back (ex: "Já tem alunos inscritos")
+      alert(`Erro: ${msg}`);
       setDeleteModalOpen(false);
     }
   };
 
+  // --- GERENCIAMENTO DE EDIÇÃO ---
+
   const handleEdit = (activity) => {
-    // Precisamos garantir que os campos existam para edição
-    // Como a listagem pode não trazer descrição/duração detalhada, idealmente buscaríamos por ID aqui.
-    // Mas para simplificar, usamos o que temos ou deixamos o usuário preencher.
-    setSelectedActivity({ 
-        ...activity,
-        // Fallbacks para campos que podem não vir na listagem simples
-        description: activity.description || "",
-        duration: activity.duration || "",
-        capacity: activity.capacity || activity.vacancies.split('/')[1] 
+    // Prepara o objeto para edição, garantindo que campos opcionais tenham valor
+    setSelectedActivity({
+      ...activity,
+      description: activity.description || "",
+      duration: activity.duration || "",
+      capacity: activity.capacity || activity.vacancies.split('/')[1]
     });
     setEditModalOpen(true);
   };
 
   const confirmEdit = async (e) => {
-    e.preventDefault(); // Impede recarregar página
+    e.preventDefault();
     try {
       await updateOfferedActivity(selectedActivity);
-      
-      // Recarrega dados para garantir consistência
-      loadData();
-      
+
+      // Recarrega dados do servidor para garantir sincronia total
+      await loadData();
+
       setEditModalOpen(false);
       alert("Atividade editada com sucesso!");
     } catch (msg) {
@@ -99,12 +108,12 @@ function MyOfferedActivities() {
     <div className="offered-activities-container">
       <div className="page-header">
         <h1>Minhas Atividades Ofertadas</h1>
-        
+
         <div className="filters-wrapper">
           <div className="search-box">
-            <input 
-              type="text" 
-              placeholder="Buscar pelo nome..." 
+            <input
+              type="text"
+              placeholder="Buscar pelo nome..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -144,57 +153,59 @@ function MyOfferedActivities() {
         )}
       </div>
 
-      {/* --- MODAL DE EXCLUSÃO --- */}
-      <Modal 
-        isOpen={isDeleteModalOpen} 
+      {/* Modal de Exclusão */}
+      <Modal
+        isOpen={isDeleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         title="Excluir Atividade"
       >
-        <p>Tem certeza que deseja excluir <strong>{selectedActivity?.name}</strong>?</p>
+        <p>Tem certeza que deseja excluir a atividade <strong>{selectedActivity?.name}</strong>?</p>
         <div className="modal-actions">
           <button className="btn-cancel-modal" onClick={() => setDeleteModalOpen(false)}>Cancelar</button>
           <button className="btn-danger" onClick={confirmDelete}>Confirmar</button>
         </div>
       </Modal>
 
-      {/* --- MODAL DE EDIÇÃO --- */}
-      <Modal 
-        isOpen={isEditModalOpen} 
+      {/* Modal de Edição */}
+      <Modal
+        isOpen={isEditModalOpen}
         onClose={() => setEditModalOpen(false)}
         title="Editar Atividade"
       >
         <form onSubmit={confirmEdit}>
-            <div className="modal-form-group">
+          <div className="modal-form-group">
             <label>Nome:</label>
             <input type="text" name="name" defaultValue={selectedActivity?.name} onChange={handleChange} />
-            </div>
-            {/* Adicionei os campos que faltavam para ficar igual ao do Admin */}
-            <div className="modal-form-group">
+          </div>
+
+          <div className="modal-form-group">
             <label>Tipo:</label>
             <select name="type" value={selectedActivity?.type} onChange={handleChange}>
-                <option value="Aula">Aula</option>
-                <option value="Treino">Treino</option>
+              <option value="Aula">Aula</option>
+              <option value="Treino">Treino</option>
             </select>
-            </div>
-            <div className="modal-form-group">
+          </div>
+
+          <div className="modal-form-group">
             <label>Descrição:</label>
             <textarea className="modal-textarea" name="description" rows="3" defaultValue={selectedActivity?.description} onChange={handleChange}></textarea>
-            </div>
-            <div className="modal-row">
+          </div>
+
+          <div className="modal-row">
             <div className="modal-form-group">
-                <label>Duração (min):</label>
-                <input type="number" name="duration" defaultValue={selectedActivity?.duration} onChange={handleChange} />
+              <label>Duração (min):</label>
+              <input type="number" name="duration" defaultValue={selectedActivity?.duration} onChange={handleChange} />
             </div>
             <div className="modal-form-group">
-                <label>Capacidade:</label>
-                <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
+              <label>Capacidade:</label>
+              <input type="number" name="capacity" defaultValue={selectedActivity?.capacity} onChange={handleChange} />
             </div>
-            </div>
-            
-            <div className="modal-actions">
+          </div>
+
+          <div className="modal-actions">
             <button type="button" className="btn-cancel-modal" onClick={() => setEditModalOpen(false)}>Cancelar</button>
             <button type="submit" className="btn-confirm">Salvar</button>
-            </div>
+          </div>
         </form>
       </Modal>
 

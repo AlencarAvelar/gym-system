@@ -1,35 +1,48 @@
 import axios from 'axios';
 
-// Configura a URL base
+/**
+ * Instância principal do Axios configurada para comunicação com a API.
+ * Define a URL base e configurações de credenciais.
+ */
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Porta do Back-End
-  withCredentials: true // Importante para cookies, se usado
+  baseURL: 'http://localhost:5000/api',
+  withCredentials: true
 });
 
-// Interceptor para injetar o Token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('gym_token');
-  
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+/**
+ * Interceptor de Requisição.
+ * Injeta automaticamente o token JWT no cabeçalho Authorization
+ * de todas as requisições, caso o usuário esteja autenticado.
+ */
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('gym_token');
 
-// Interceptor para tratar erros globais (Ex: Token expirado)
-api.interceptors.response.use((response) => {
-  return response;
-}, (error) => {
-  if (error.response && error.response.status === 401) {
-    // Se der erro 401 (Não autorizado), pode ser token vencido
-    // Podemos limpar o storage e redirecionar para login (opcional por enquanto)
-    // localStorage.removeItem('gym_token');
-    // window.location.href = '/';
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return Promise.reject(error);
-});
+);
+
+/**
+ * Interceptor de Resposta.
+ * Centraliza o tratamento de erros da API.
+ */
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Tratamento para erro 401 (Não Autorizado / Token Expirado)
+    if (error.response && error.response.status === 401) {
+      // Futuramente, pode-se implementar aqui o logout automático
+      // ou a lógica de refresh token.
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

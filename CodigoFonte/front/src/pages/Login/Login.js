@@ -3,6 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../../services/authService';
 import './Login.css';
 
+/**
+ * Componente da página de Login (Home pública).
+ * Apresenta o formulário de autenticação e texto promocional do sistema.
+ */
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -10,19 +14,21 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Manipula o envio do formulário de login.
+   * Tenta autenticar via serviço e redireciona o usuário conforme seu perfil.
+   */
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      // Chama o serviço de autenticação
       const usuario = await authService.login(email, password);
 
-      // Redirecionamento inteligente baseado no tipo
       if (usuario) {
         const tipo = usuario.tipo_usuario;
-        
+
         if (tipo === 'Administrador') {
           navigate('/admin');
         } else if (tipo === 'Professor' || tipo === 'Personal Trainer') {
@@ -39,52 +45,53 @@ function Login() {
   };
 
   return (
-    <div className="login-page"> 
+    <div className="login-page">
       <div className="login-content">
-        
-        {/* --- NOVO TEXTO DE MARKETING --- */}
+
+        {/* Seção Promocional (Hero Text) */}
         <div className="attention-text">
           <h1>Desperte sua</h1>
           <h1 className="highlight-text">Melhor Versão.</h1>
-          
+
           <p>
-            Tecnologia e performance unidas para transformar sua rotina. 
-            Gerencie seus horários com facilidade, garanta seu lugar nas melhores aulas 
+            Tecnologia e performance unidas para transformar sua rotina.
+            Gerencie seus horários com facilidade, garanta seu lugar nas melhores aulas
             e foque no que realmente importa: <strong>seus resultados</strong>.
           </p>
-          
+
           <p className="sub-text">O primeiro passo para a mudança começa agora.</p>
         </div>
 
+        {/* Formulário de Acesso */}
         <form id="login-form" className="login-form" onSubmit={handleSubmit}>
           <h2>Acesse sua conta</h2>
 
           {error && <p className="login-error-message">{error}</p>}
-          
+
           <div className="input-group">
             <label htmlFor="email">Email:</label>
-            <input 
-              type="email" 
-              id="email" 
-              placeholder="seuemail@exemplo.com" 
-              required 
+            <input
+              type="email"
+              id="email"
+              placeholder="seuemail@exemplo.com"
+              required
               value={email}
-              onChange={(e) => setEmail(e.target.value)} 
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          
+
           <div className="input-group">
             <label htmlFor="password">Senha:</label>
-            <input 
-              type="password" 
-              id="password" 
-              placeholder="Sua senha" 
-              required 
+            <input
+              type="password"
+              id="password"
+              placeholder="Sua senha"
+              required
               value={password}
-              onChange={(e) => setPassword(e.target.value)} 
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-          
+
           <button type="submit" className="login-button" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

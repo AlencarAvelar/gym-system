@@ -1,33 +1,38 @@
 import React, { useState } from 'react';
-import { generateReport } from '../../../services/adminService'; // Importa o serviço
+import { generateReport } from '../../../services/adminService';
 import './Reports.css';
 
+/**
+ * Componente da tela "Relatórios" (Painel do Admin).
+ * Permite gerar relatórios estatísticos de agendamentos baseados em um período de tempo.
+ */
 function Reports() {
-  // Estados
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Aciona o serviço de geração de relatórios com as datas selecionadas.
+   */
   const handleGenerate = async (e) => {
     e.preventDefault();
-    
+
     if (!startDate || !endDate) {
       alert("Por favor, selecione as datas de início e fim.");
       return;
     }
 
-    setLoading(true); // Inicia loading
+    setLoading(true);
 
     try {
-      // Chama o serviço para processar os dados
       const data = await generateReport(startDate, endDate);
       setReportData(data);
     } catch (error) {
       console.error("Erro ao gerar relatório", error);
-      alert("Erro ao gerar relatório.");
+      alert("Não foi possível gerar o relatório. Tente novamente.");
     } finally {
-      setLoading(false); // Para loading
+      setLoading(false);
     }
   };
 
@@ -42,35 +47,35 @@ function Reports() {
         <form onSubmit={handleGenerate} className="filters-form">
           <div className="form-group">
             <label>Data de Início:</label>
-            <input 
-              type="date" 
-              value={startDate} 
-              onChange={(e) => setStartDate(e.target.value)} 
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label>Data de Fim:</label>
-            <input 
-              type="date" 
-              value={endDate} 
-              onChange={(e) => setEndDate(e.target.value)} 
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
               required
             />
           </div>
 
           <button type="submit" className="btn-generate" disabled={loading}>
-            {loading ? "Gerando..." : "Gerar Relatório"}
+            {loading ? "Processando..." : "Gerar Relatório"}
           </button>
         </form>
       </div>
 
-      {/* Resultados */}
+      {/* Área de Resultados */}
       {reportData && (
         <div className="report-results">
-          
-          {/* Resumo / Cards */}
+
+          {/* Cards de Resumo Estatístico */}
           <div className="summary-cards">
             <div className="summary-card blue">
               <h3>Total de Alunos</h3>
@@ -101,7 +106,9 @@ function Reports() {
                       <td>{item.date.split('-').reverse().join('/')}</td>
                       <td>{item.activity}</td>
                       <td>
-                        <span className={`badge ${item.type.toLowerCase()}`}>{item.type}</span>
+                        <span className={`badge ${item.type ? item.type.toLowerCase() : 'aula'}`}>
+                          {item.type || 'Atividade'}
+                        </span>
                       </td>
                       <td>{item.total}</td>
                     </tr>

@@ -1,13 +1,15 @@
 import React from 'react';
 import './Modal.css';
 
-// O componente recebe:
-// - isOpen: se deve aparecer ou não
-// - onClose: função para fechar
-// - title: o título da janela
-// - children: o conteúdo (inputs, botões) que vai dentro
+/**
+ * Componente genérico de Modal (Pop-up).
+ * @param {boolean} isOpen - Controla a visibilidade.
+ * @param {function} onClose - Função chamada ao fechar.
+ * @param {string} title - Título do modal.
+ * @param {ReactNode} children - Conteúdo interno do modal.
+ */
 function Modal({ isOpen, onClose, title, children }) {
-  if (!isOpen) return null; // Se não estiver aberto, não renderiza nada
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay">

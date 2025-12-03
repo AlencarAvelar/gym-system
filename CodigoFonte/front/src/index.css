@@ -1,12 +1,38 @@
-/* Adiciona o scroll suave para todo o site */
-html {
-  scroll-behavior: smooth;
+/* =========================================
+   VARIÁVEIS GLOBAIS (Design System)
+   ========================================= */
+:root {
+  /* Paleta de Cores */
+  --color-primary: #007bff;       /* Azul Cliente */
+  --color-primary-dark: #0056b3;
+  
+  --color-admin: #6f42c1;         /* Roxo Admin */
+  --color-admin-dark: #59359a;
+  
+  --color-pro: #fd7e14;           /* Laranja Profissional */
+  
+  --color-success: #28a745;
+  --color-danger: #dc3545;
+  
+  /* Tons Neutros */
+  --bg-dark: #1c1c1c;
+  --bg-light: #f4f6f8;
+  --text-dark: #333333;
+  --text-light: #ffffff;
+  --text-muted: #666666;
+  --border-color: #eeeeee;
+
+  /* Layout */
+  --header-height: 70px;
 }
 
-/* O resto do seu index.css (como o 'body') */
-body {
-  margin: 0;
-  /* ... etc ... */
+/* =========================================
+   CONFIGURAÇÕES GERAIS
+   ========================================= */
+
+/* Scroll suave para navegação interna */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -16,6 +42,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light); /* Fundo padrão */
+  color: var(--text-dark);
 }
 
 code {
