@@ -4,13 +4,13 @@ const AtividadeController = require('../controllers/atividadeController');
 const { protect, restrictTo } = require('../middlewares/authMiddleware'); // ← ADICIONAR
 const { validateAtividade, validateAtividadeUpdate } = require('../middlewares/atividadeValidation'); // ← SE EXISTIR
 
-// Rotas SEM autenticação (para testes públicos - OPCIONAL)
-router.get('/public', AtividadeController.getAllPublic); // ← NOVO (se quiser manter compatibilidade)
-router.get('/public/disponiveis', AtividadeController.getAvailablePublic); // ← NOVO
+// Rotas SEM autenticação 
+router.get('/public', AtividadeController.getAllPublic); 
+router.get('/public/disponiveis', AtividadeController.getAvailablePublic); 
 
-// Rotas COM autenticação (produção)
-router.get('/', protect, AtividadeController.getAll); // ← PROTEGIDA
-router.get('/disponiveis', protect, AtividadeController.getAvailable); // ← PROTEGIDA
+// Rotas COM autenticação 
+router.get('/', protect, AtividadeController.getAll);
+router.get('/disponiveis', protect, AtividadeController.getAvailable); 
 
 // Cadastrar atividade (Apenas Professor/Personal Trainer/Admin)
 router.post('/', 

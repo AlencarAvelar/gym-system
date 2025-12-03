@@ -28,8 +28,7 @@ class AuthService {
       
       const senhaValida = (senha === usuario.senha);
       
-      // MODO PRODUÇÃO (descomente quando voltar ao normal):
-      // const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    
       
       if (!senhaValida) {
         return {

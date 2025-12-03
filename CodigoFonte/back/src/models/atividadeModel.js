@@ -147,10 +147,10 @@ class AtividadeModel {
       descricao,
       duracao,
       capacidade_max,
-      id_profissional // <--- NOVO: Extraímos o ID daqui
+      id_profissional 
     } = atividadeData;
 
-    // CORREÇÃO: Adicionamos id_profissional = $6 no SQL
+
     const query = `
       UPDATE atividade
       SET 
@@ -164,7 +164,6 @@ class AtividadeModel {
       RETURNING *;
     `;
 
-    // CORREÇÃO: Adicionamos o valor no array e mudamos o ID para a posição 7
     const values = [
       nome_atividade,
       tipo_atividade,
